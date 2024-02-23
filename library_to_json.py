@@ -97,10 +97,11 @@ def pb_to_port(pair: edgir.elem_pb2.NamedPortLike):
     raise ValueError(f"unknown pair value type ${pair.value}")
 
 
+ParamValueTypes = Union[int, float, bool, Tuple[float, float], str, List[Any]]
 class ParamJsonDict(BaseModel):
   name: str
   type: str  # int | float | bool | range | string | array
-  default_value: Optional[Union[int, float, bool, Tuple[float, float], str, List[Any]]]  # in Python HDL
+  default_value: Optional[ParamValueTypes]  # in Python HDL
 
 
 class BlockJsonDict(BaseModel):
@@ -148,7 +149,7 @@ if __name__ == '__main__':
                           inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.POSITIONAL_ONLY,
                           inspect.Parameter.KEYWORD_ONLY]:
           param_pb = edgir.pair_get_opt(block_proto.params, param_name)
-          default_value = None
+          default_value: Optional[ParamValueTypes] = None
           if param_pb is not None:
             if param.default is inspect.Parameter.empty:
               default_value = None
@@ -215,7 +216,6 @@ if __name__ == '__main__':
         argParams=argParams,
         is_abstract=block_proto.is_abstract
       )
-
       all_blocks.append(block_dict)
     # elif isinstance(obj, edg_core.Link):
     #     print(f"Elaborating link {name}")
