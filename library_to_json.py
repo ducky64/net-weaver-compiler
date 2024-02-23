@@ -1,8 +1,9 @@
 # Simple tool that scans for libraries and dumps the whole thing to a proto file
-from typing import TypedDict, Tuple, Optional
-import json
+from typing import Optional, List, Any, Union, Tuple
 import inspect
+from pydantic import BaseModel, RootModel
 
+# needed to enable EDG as a submodule instead of requiring it to be installed as a system package
 import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
@@ -18,11 +19,11 @@ def simpleName(target: edgir.ref_pb2.LibraryPath) -> str:
   return target.target.name.split('.')[-1]
 
 
-class PortJsonDict(TypedDict):
+class PortJsonDict(BaseModel):
   name: str  # name in parent
   type: str  # type of self; if array refers to the array element type
   is_array: bool
-  hint_position: str  # left | right | up | down | '' (empty)
+  hint_position: Optional[str]  # left | right | up | down | '' (empty)
 
 def port_to_dir(name: str, target: edgir.ref_pb2.LibraryPath) -> Optional[str]:
   simpleTarget = simpleName(target)
@@ -96,13 +97,13 @@ def pb_to_port(pair: edgir.elem_pb2.NamedPortLike):
     raise ValueError(f"unknown pair value type ${pair.value}")
 
 
-class ParamJsonDict(TypedDict):
+class ParamJsonDict(BaseModel):
   name: str
   type: str  # int | float | bool | range | string | array
-  default_value: Optional[str]  # in Python HDL
+  default_value: Optional[Union[int, float, bool, Tuple[float, float], str, List[Any]]]  # in Python HDL
 
 
-class BlockJsonDict(TypedDict):
+class BlockJsonDict(BaseModel):
   name: str  # name in superblock - empty for libraries
   type: str  # type of self
   superClasses: list[str]  # superclasses of self
@@ -111,13 +112,8 @@ class BlockJsonDict(TypedDict):
   is_abstract: bool
 
 
-class NetJsonDict(TypedDict):
-  name: Optional[str]  # optional net name / label
-  ports: list[Tuple[str, str]]  # block name, port name - note, interior connects only
-
-
-class NetlistJsonDict(TypedDict):
-  nets: list[NetJsonDict]
+class LibraryJson(RootModel):
+  root: list[BlockJsonDict]
 
 
 OUTPUT_FILE = "library.json"
@@ -152,6 +148,7 @@ if __name__ == '__main__':
                           inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.POSITIONAL_ONLY,
                           inspect.Parameter.KEYWORD_ONLY]:
           param_pb = edgir.pair_get_opt(block_proto.params, param_name)
+          default_value = None
           if param_pb is not None:
             if param.default is inspect.Parameter.empty:
               default_value = None
@@ -159,7 +156,7 @@ if __name__ == '__main__':
               default_value = param.default
             elif isinstance(param.default, tuple) and len(param.default) == 2 and \
                 isinstance(param.default[0], (int, float)) and isinstance(param.default[1], (int, float)):
-              default_value = param.default
+              default_value = str(param.default)
             elif isinstance(param.default, edg_core.Range):
               range = param.default
               default_value = (range.lower, range.upper)
@@ -186,7 +183,6 @@ if __name__ == '__main__':
                 print(f"{name}.{param_name}: bad binding {param.default.binding}")
             else:
               print(f"{name}.{param_name}: failed to parse default {param.default}")
-              default_value = None
 
             if param_pb.HasField('floating'):
               param_type = 'float'
@@ -206,7 +202,7 @@ if __name__ == '__main__':
             argParams.append(ParamJsonDict(
               name=param_name,
               type=param_type,
-              defaultValue=default_value
+              default_value=default_value
             ))
           else:
             print(f"missing param {param_name} in {name}")
@@ -236,7 +232,9 @@ if __name__ == '__main__':
 
     count += 1
 
+  library_json = LibraryJson(root=all_blocks)
+
   print(f"Writing {count} classes to {OUTPUT_FILE}")
 
   with open(OUTPUT_FILE, 'w') as file:
-    file.write(json.dumps(all_blocks, indent=2))
+    file.write(library_json.model_dump_json(indent=2))
