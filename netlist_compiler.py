@@ -8,9 +8,9 @@ import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
 
 
-class JsonNet(BaseModel):
+class JsonNetPort(BaseModel):
   nodeId: str  # unused, internal node ID
-  portIdx: str  # unused
+  portIdx: int  # unused
   name: str  # name of node, may be same as node ID
   portName: str  # name of port (consistent w/ HDL)
 
@@ -39,13 +39,13 @@ class JsonNode(BaseModel):
   id: str  # node ID
 
 class JsonGraph(BaseModel):
-  nodes: list[Tuple[str, JsonNode]]
-  edges: list[Tuple[str, Any]]  # ignored
+  nodes: dict[str, JsonNode]
+  edges: dict[str, Any]  # ignored
 
 class JsonNetlist(BaseModel):
-  nets: list[JsonNet]
-  nodes: JsonGraph
-  graphUiData: Any  # ignored
+  nets: list[list[JsonNetPort]]
+  graph: JsonGraph
+  graphUIData: Any  # ignored
 
 
 if __name__ == '__main__':
@@ -53,4 +53,4 @@ if __name__ == '__main__':
     netlist = JsonNetlist.model_validate_json(f.read())
 
     print(netlist)
-    print(netlist.nodes)
+    print(netlist.graph.nodes)
