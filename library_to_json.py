@@ -1,5 +1,4 @@
 # Simple tool that scans for libraries and dumps the whole thing to a proto file
-import sys
 from typing import TypedDict, Tuple, Optional
 import json
 import inspect
