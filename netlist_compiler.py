@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 from pydantic import BaseModel
 
 import sys
@@ -68,7 +68,6 @@ class MyModule(BoardTop):
       block_class = node.data.type
       assert block_class.isidentifier(), f"non-identifier block class {block_class}"
       code += f"    self.{node_name} = self.Block({block_class}())\n"
-
     code += "\n"
 
     for net in netlist.nets:
@@ -85,7 +84,6 @@ class MyModule(BoardTop):
         else:
           net_ports.append(f"self.{port.name}.{port.portName}.request()")
       code += f"    self.connect({', '.join(net_ports)})\n"
-
     code += "\n"
 
     code += """compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
@@ -101,10 +99,10 @@ netlist = netlist_all[0][1]"""
     }
     exec(code, exec_env)
 
-    netlist = exec_env['netlist']
-    compiled: edg_core.ScalaCompilerInterface.CompiledDesign = exec_env['compiled']
+    compiled_netlist = cast(str, exec_env['netlist'])
+    compiled = cast(edg_core.ScalaCompilerInterface.CompiledDesign, exec_env['compiled'])
 
-    print(f"Generated netlist: \n{netlist}")
+    print(f"Generated netlist: \n{compiled_netlist}")
     print('\n')
 
     if compiled.error:
