@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
+import edg_core
 
 
 class JsonNetPort(BaseModel):
@@ -50,10 +51,8 @@ if __name__ == '__main__':
   with open("BasicBlinky.json") as f:
     netlist = JsonNetlist.model_validate_json(f.read())
 
-    code = f"""
-import sys
-import os.path
-sys.path.append(edg_dir)
+    code = f"""import os
+os.chdir(edg_dir)
 
 from edg import *
           
@@ -92,12 +91,21 @@ class MyModule(BoardTop):
     code += """compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
 compiled.append_values(RefdesRefinementPass().run(compiled))
 netlist_all = NetlistBackend().run(compiled)
-netlist = netlist_all[0][1]
-"""
+netlist = netlist_all[0][1]"""
 
-    print(code)
+    print(f"Generated HDL: \n{code}")
+    print('\n')
+
     exec_env = {
       'edg_dir': os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks')
     }
     exec(code, exec_env)
-    print(exec_env['netlist'])
+
+    netlist = exec_env['netlist']
+    compiled: edg_core.ScalaCompilerInterface.CompiledDesign = exec_env['compiled']
+
+    print(f"Generated netlist: \n{netlist}")
+    print('\n')
+
+    if compiled.error:
+      print(f"Errors during compilation: \n{compiled.error}")
