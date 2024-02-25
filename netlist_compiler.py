@@ -37,9 +37,19 @@ class JsonNode(BaseModel):
   ports: list[list[str]]  # port names
   id: str  # node ID
 
+class JsonEdgeTarget(BaseModel):
+  node_id: str  # node ID
+  idx: int  # port index - TODO, should use port name instead
+
+class JsonEdge(BaseModel):
+  data: Any  # ignored
+  src: JsonEdgeTarget
+  dst: JsonEdgeTarget
+  id: str  # ignored
+
 class JsonGraph(BaseModel):
   nodes: dict[str, JsonNode]
-  edges: dict[str, Any]  # ignored
+  edges: dict[str, JsonEdge]
 
 class JsonNetlist(BaseModel):
   nets: list[list[JsonNetPort]]
@@ -75,14 +85,22 @@ class MyModule(BoardTop):
       for port in net:
         assert port.name.isidentifier(), f"non-identifier block reference {port.name}"
         assert port.portName.isidentifier(), f"non-identifier port reference {port.portName}"
+
         node = netlist.graph.nodes[port.name]
         node_ports = [node_port for node_port in node.data.ports if node_port.name == port.portName]
         assert len(node_ports) == 1
         node_port = node_ports[0]
-        if not node_port.array:
-          net_ports.append(f"self.{port.name}.{port.portName}")
-        else:
+
+        # edge_srcs = [edge for (name, edge) in netlist.graph.edges.items()
+        #              if edge.src.node_id == port.name and edge.src.idx == node_port._idx]
+        # edge_dsts = [edge for (name, edge) in netlist.graph.edges.items()
+        #              if edge.dst.node_id == port.name and edge.dst.idx == node_port._idx]
+        # TODO underscores seem broken w/ Pydantic
+
+        if node_port.array:
           net_ports.append(f"self.{port.name}.{port.portName}.request()")
+        else:
+          net_ports.append(f"self.{port.name}.{port.portName}")
       code += f"    self.connect({', '.join(net_ports)})\n"
     code += "\n"
 
