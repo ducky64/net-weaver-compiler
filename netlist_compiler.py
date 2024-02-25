@@ -50,5 +50,32 @@ if __name__ == '__main__':
   with open("BasicBlinky.json") as f:
     netlist = JsonNetlist.model_validate_json(f.read())
 
-    print(netlist)
-    print(netlist.graph.nodes)
+    code = """
+class MyModule(BoardTop):
+  def __init__(self):
+"""
+
+    for node_name, node in netlist.graph.nodes.items():
+      assert node_name.isidentifier(), f"non-identifier block name {node_name}"
+      block_class = node.data.type
+      assert block_class.isidentifier(), f"non-identifier block class {block_class}"
+      code += f"    self.{node_name} = self.Block({block_class}())\n"
+
+    code += "\n"
+
+    for net in netlist.nets:
+      net_ports = []
+      for port in net:
+        assert port.name.isidentifier(), f"non-identifier block reference {port.name}"
+        assert port.portName.isidentifier(), f"non-identifier port reference {port.portName}"
+        node = netlist.graph.nodes[port.name]
+        node_ports = [node_port for node_port in node.data.ports if node_port.name == port.portName]
+        assert len(node_ports) == 1
+        node_port = node_ports[0]
+        if not node_port.array:
+          net_ports.append(f"self.{port.name}.{port.portName}")
+        else:
+          net_ports.append(f"self.{port.name}.{port.portName}.request()")
+      code += f"    self.connect({', '.join(net_ports)})\n"
+
+    print(code)
