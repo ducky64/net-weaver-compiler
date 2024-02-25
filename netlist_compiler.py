@@ -50,10 +50,19 @@ if __name__ == '__main__':
   with open("BasicBlinky.json") as f:
     netlist = JsonNetlist.model_validate_json(f.read())
 
-    code = """
+    code = f"""
+import sys
+import os.path
+sys.path.append(edg_dir)
+
+from edg import *
+          
 class MyModule(BoardTop):
   def __init__(self):
+    super().__init__()
 """
+
+    code += "\n"
 
     for node_name, node in netlist.graph.nodes.items():
       assert node_name.isidentifier(), f"non-identifier block name {node_name}"
@@ -78,4 +87,17 @@ class MyModule(BoardTop):
           net_ports.append(f"self.{port.name}.{port.portName}.request()")
       code += f"    self.connect({', '.join(net_ports)})\n"
 
+    code += "\n"
+
+    code += """compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
+compiled.append_values(RefdesRefinementPass().run(compiled))
+netlist_all = NetlistBackend().run(compiled)
+netlist = netlist_all[0][1]
+"""
+
     print(code)
+    exec_env = {
+      'edg_dir': os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks')
+    }
+    exec(code, exec_env)
+    print(exec_env['netlist'])
