@@ -18,7 +18,7 @@ class JsonNodePort(BaseModel):
   leftRightUpDown: str  # ignored
   type: str  # type of port
   array: bool  # whether port is an array
-  _idx: int
+  idx: int
 
 class JsonNodeArgParam(BaseModel):
   name: str  # name of parameter (consistent w/ HDL)
@@ -39,7 +39,8 @@ class JsonNode(BaseModel):
 
 class JsonEdgeTarget(BaseModel):
   node_id: str  # node ID
-  idx: int  # port index - TODO, should use port name instead
+  idx: int  # port index, unused
+  portName: str  # name of port (consistent w/ HDL)
 
 class JsonEdge(BaseModel):
   data: Any  # ignored
@@ -66,7 +67,7 @@ os.chdir(edg_dir)
 
 from edg import *
           
-class MyModule(BoardTop):
+class MyModule(JlcBoardTop):
   def __init__(self):
     super().__init__()
 """
