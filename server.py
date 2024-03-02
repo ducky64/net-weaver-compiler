@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from pydantic import BaseModel, ValidationError
 
 from netlist_compiler import JsonNetlist
@@ -15,10 +15,10 @@ class NetlistCompilerResponse(BaseModel):
   kicadNetlist: Optional[str]
   errors: List[str]
 
-@app.route("/compile")
+@app.route("/compile", methods=['POST'])
 def compile():
   try:
-    netlist = JsonNetlist.model_validate_json("BasicBlinky.json")
+    netlist = JsonNetlist.model_validate_json(request.form['netlist'])
   except ValidationError as e:
     return jsonify(ErrorCompilerResponse(error="invalid input format")), 400
 
