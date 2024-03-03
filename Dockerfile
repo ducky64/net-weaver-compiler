@@ -4,6 +4,10 @@ RUN apk update
 RUN pip install --no-cache-dir pipenv
 
 WORKDIR /usr/app
+
+COPY PolymorphicBlocks ./
+RUN pip install -r PolymorphicBlocks/requirements.txt
+
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
