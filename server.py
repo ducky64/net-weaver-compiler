@@ -11,7 +11,7 @@ class NetlistCompilerResponse(BaseModel):
   errors: List[str]
 
 
-app = Flask(__name__, port=7761)
+app = Flask(__name__)
 
 
 @app.route("/compile", methods=['POST'])
