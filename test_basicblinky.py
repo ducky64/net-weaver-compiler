@@ -12,8 +12,8 @@ class BasicBlinkyTestCase(unittest.TestCase):
     with app.test_client() as client:
       response = client.post('/compile', data={'netlist': netlist_data})
 
-      self.assertEqual(response.status_code, 200)
       self.assertEqual(response.json, {
         'kicadNetlist': 'TODO',
         'errors': []
       })
+      self.assertEqual(response.status_code, 200)
