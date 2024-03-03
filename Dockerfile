@@ -8,5 +8,5 @@ COPY requirements.txt server.py netlist_compiler.py PolymorphicBlocks ./
 
 RUN pip install -r requirements.txt
 
-EXPOSE 5000
+EXPOSE 7761
 ENTRYPOINT ["/usr/src/app/bootstrap.sh"]
