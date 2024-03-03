@@ -61,7 +61,8 @@ class JsonNetlist(BaseModel):
 def compile_netlist(netlist: JsonNetlist) -> Tuple[str, List[str]]:
   """Compiles the JsonNetlist to a KiCad netlist, returning the KiCad netlist along with a list of model
   validation errors (if any)."""
-  code = f"""import os
+  code = f"""\
+import os
 os.chdir(edg_dir)
 
 from edg import *
@@ -104,13 +105,11 @@ class MyModule(JlcBoardTop):
     code += f"    self.connect({', '.join(net_ports)})\n"
   code += "\n"
 
-  code += """compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
+  code += """\
+compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
 compiled.append_values(RefdesRefinementPass().run(compiled))
 netlist_all = NetlistBackend().run(compiled)
 netlist = netlist_all[0][1]"""
-
-  # print(f"Generated HDL: \n{code}")
-  # print('\n')
 
   exec_env = {
     'edg_dir': os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks')
@@ -120,7 +119,7 @@ netlist = netlist_all[0][1]"""
   compiled_netlist = cast(str, exec_env['netlist'])
   compiled = cast(edg_core.ScalaCompilerInterface.CompiledDesign, exec_env['compiled'])
 
-  # print(f"Generated netlist: \n{compiled_netlist}")
-  # print('\n')
-
-  return compiled_netlist, [compiled.error]
+  if compiled.error:
+    return compiled_netlist, [compiled.error]
+  else:
+    return compiled_netlist, []
