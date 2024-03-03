@@ -2,6 +2,4 @@ services:
   web:
     build: .
     ports:
-      - "7761:7761"
-  redis:
-    image: "redis:alpine"
+      - "7761"
