@@ -5,7 +5,7 @@ RUN pip install --no-cache-dir pipenv
 
 WORKDIR /usr/app
 
-COPY PolymorphicBlocks ./
+COPY PolymorphicBlocks/ ./PolymorphicBlocks/
 RUN pip install -r PolymorphicBlocks/requirements.txt
 
 COPY requirements.txt ./
