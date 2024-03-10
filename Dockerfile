@@ -4,11 +4,13 @@ RUN apk add openjdk11
 
 WORKDIR /usr/app
 
-COPY PolymorphicBlocks/ ./PolymorphicBlocks/
+COPY PolymorphicBlocks/requirements.txt ./PolymorphicBlocks/requirements.txt
 RUN pip install -r PolymorphicBlocks/requirements.txt
 
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
+
+COPY PolymorphicBlocks/ ./PolymorphicBlocks/
 
 COPY server.py netlist_compiler.py PolymorphicBlocks ./
 ENV FLASK_APP=server.py
