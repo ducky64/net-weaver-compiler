@@ -17,7 +17,7 @@ app = Flask(__name__)
 @app.route("/compile", methods=['POST'])
 def compile():
   try:
-    json_netlist = JsonNetlist.model_validate_json(request.form['netlist'])
+    json_netlist = JsonNetlist.model_validate_json(request.get_data())
   except ValidationError as e:
     return jsonify(NetlistCompilerResponse(kicadNetlist=None, errors=["invalid input format"]).model_dump()), 400
 
