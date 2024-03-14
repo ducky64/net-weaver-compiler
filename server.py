@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from pydantic import BaseModel, ValidationError
 
 from netlist_compiler import JsonNetlist, compile_netlist
@@ -14,8 +14,15 @@ class NetlistCompilerResponse(BaseModel):
 app = Flask(__name__)
 
 
-@app.route("/compile", methods=['POST'])
+@app.route("/compile", methods=['POST', 'OPTIONS'])
 def compile():
+  if request.method == "OPTIONS": # CORS preflight
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response
+
   try:
     json_netlist = JsonNetlist.model_validate_json(request.get_data())
   except ValidationError as e:
@@ -35,4 +42,7 @@ def compile():
     errors=model_errors
   ).model_dump())
   response.headers.add('Access-Control-Allow-Origin', '*')
+  response.headers.add('Access-Control-Allow-Headers', '*')
+  response.headers.add('Access-Control-Allow-Methods', '*')
+
   return response
