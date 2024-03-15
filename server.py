@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 
 @app.route("/version", methods=['GET'])
-def compile():
+def version():
   return "0.3"
 
 @app.route("/compile", methods=['POST', 'OPTIONS'])
