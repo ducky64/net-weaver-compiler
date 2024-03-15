@@ -14,6 +14,10 @@ class NetlistCompilerResponse(BaseModel):
 app = Flask(__name__)
 
 
+@app.route("/version", methods=['GET'])
+def compile():
+  return "0.3"
+
 @app.route("/compile", methods=['POST', 'OPTIONS'])
 def compile():
   if request.method == "OPTIONS": # CORS preflight
