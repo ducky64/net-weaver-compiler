@@ -1,4 +1,5 @@
 import unittest
+import os.path
 
 from server import app
 app.testing = True
@@ -92,7 +93,8 @@ EXPECTED_NETLIST = """\
 
 class BasicBlinkyTestCase(unittest.TestCase):
   def test_compile(self):
-    with open("BasicBlinky.json") as f:
+    # the server messes with cwd so we need to use the absolute path
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "BasicBlinky.json")) as f:
       netlist_data = f.read()
 
     with app.test_client() as client:

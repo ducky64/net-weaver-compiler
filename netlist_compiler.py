@@ -113,7 +113,6 @@ class MyModule(JlcBoardTop):
       else:
         net_ports.append(f"self.{port.name}.{port.portName}")
     code += f"    self.connect({', '.join(net_ports)})\n"
-  code += "\n"
 
   return code
 
