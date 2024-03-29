@@ -77,7 +77,20 @@ class MyModule(JlcBoardTop):
     args_str = ""
     for arg_param in node.data.argParams:
       if arg_param.default_value != arg_param.value and arg_param.value:
-        args_str += f", {arg_param.name}={arg_param.value}"
+        # parse and sanitize the value
+        if arg_param.type == 'int':
+          arg_value = str(int(arg_param.value))
+        elif arg_param.type == 'float':
+          arg_value = str(float(arg_param.value))
+        elif arg_param.type == 'range':
+          assert isinstance(arg_param.value, list) and len(arg_param.value) == 2
+          arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
+        elif arg_param.type == 'string':
+          raise ValueError(f"TODO")
+        else:
+          raise ValueError(f"unknown arg param type {arg_param.type}")
+
+        args_str += f", {arg_param.name}={arg_value}"
     code += f"    self.{node_name} = self.Block({block_class}(){args_str})\n"
   code += "\n"
 
