@@ -74,7 +74,7 @@ class MyModule(JlcBoardTop):
     block_class = node.data.type
     assert block_class.isidentifier(), f"non-identifier block class {block_class}"
 
-    args_str = ""
+    args_elts = []
     for arg_param in node.data.argParams:
       if arg_param.default_value != arg_param.value and arg_param.value:
         # parse and sanitize the value
@@ -90,8 +90,8 @@ class MyModule(JlcBoardTop):
         else:
           raise ValueError(f"unknown arg param type {arg_param.type}")
 
-        args_str += f", {arg_param.name}={arg_value}"
-    code += f"    self.{node_name} = self.Block({block_class}(){args_str})\n"
+        args_elts.append(f"{arg_param.name}={arg_value}")
+    code += f"    self.{node_name} = self.Block({block_class}({', '.join(args_elts)}))\n"
   code += "\n"
 
   for net in netlist.nets:
