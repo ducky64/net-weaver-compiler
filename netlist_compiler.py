@@ -92,13 +92,10 @@ class MyModule(JlcBoardTop):
       assert len(node_ports) == 1
       node_port = node_ports[0]
 
-      # edge_srcs = [edge for (name, edge) in netlist.graph.edges.items()
-      #              if edge.src.node_id == port.name and edge.src.idx == node_port._idx]
-      # edge_dsts = [edge for (name, edge) in netlist.graph.edges.items()
-      #              if edge.dst.node_id == port.name and edge.dst.idx == node_port._idx]
-      # TODO underscores seem broken w/ Pydantic
+      edge_dsts = [edge for (name, edge) in netlist.graph.edges.items()
+                   if edge.dst.node_id == port.name and edge.dst.portName == port.portName]
 
-      if node_port.array:
+      if node_port.array and edge_dsts:  # if array and a edge target, considered a request
         net_ports.append(f"self.{port.name}.{port.portName}.request()")
       else:
         net_ports.append(f"self.{port.name}.{port.portName}")
