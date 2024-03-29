@@ -49,6 +49,11 @@ class JsonEdge(BaseModel):
   dst: JsonEdgeTarget
   id: str  # ignored
 
+class JsonLabel(BaseModel):
+  labelName: str
+  nodeId: str
+  portIdx: int
+
 class JsonGraph(BaseModel):
   nodes: dict[str, JsonNode]
   edges: dict[str, JsonEdge]
@@ -57,6 +62,7 @@ class JsonNetlist(BaseModel):
   nets: list[list[JsonNetPort]]
   graph: JsonGraph
   graphUIData: Any  # ignored
+  labels: dict[str, JsonLabel]
 
 
 def tohdl_netlist(netlist: JsonNetlist) -> str:
@@ -94,25 +100,42 @@ class MyModule(JlcBoardTop):
     code += f"    self.{node_name} = self.Block({block_class}({', '.join(args_elts)}))\n"
   code += "\n"
 
-  for net in netlist.nets:
-    net_ports = []
-    for port in net:
-      assert port.name.isidentifier(), f"non-identifier block reference {port.name}"
-      assert port.portName.isidentifier(), f"non-identifier port reference {port.portName}"
+  for name, label in netlist.labels.items():
+    print(name)
+    pass
 
-      node = netlist.graph.nodes[port.name]
-      node_ports = [node_port for node_port in node.data.ports if node_port.name == port.portName]
-      assert len(node_ports) == 1
-      node_port = node_ports[0]
+  for name, edge in netlist.graph.edges.items():
+    src_node = netlist.graph.nodes[edge.src.node_id]
+    src_port = src_node.data.ports[edge.src.idx]
+    dst_node = netlist.graph.nodes[edge.dst.node_id]
+    dst_port = dst_node.data.ports[edge.dst.idx]
 
-      edge_dsts = [edge for (name, edge) in netlist.graph.edges.items()
-                   if edge.dst.node_id == port.name and edge.dst.portName == port.portName]
+    src_hdl = f"self.{edge.src.node_id}.{src_port.name}"
+    if dst_port.array:
+      dst_hdl = f"self.{edge.src.node_id}.{src_port.name}.request()"
+    else:
+      dst_hdl = f"self.{edge.src.node_id}.{src_port.name}"
+    code += f"    self.connect({src_hdl}, {dst_hdl})\n"
 
-      if node_port.array and edge_dsts:  # if array and a edge target, considered a request
-        net_ports.append(f"self.{port.name}.{port.portName}.request()")
-      else:
-        net_ports.append(f"self.{port.name}.{port.portName}")
-    code += f"    self.connect({', '.join(net_ports)})\n"
+  # for net in netlist.nets:
+  #   net_ports = []
+  #   for port in net:
+  #     assert port.name.isidentifier(), f"non-identifier block reference {port.name}"
+  #     assert port.portName.isidentifier(), f"non-identifier port reference {port.portName}"
+  #
+  #     node = netlist.graph.nodes[port.name]
+  #     node_ports = [node_port for node_port in node.data.ports if node_port.name == port.portName]
+  #     assert len(node_ports) == 1
+  #     node_port = node_ports[0]
+  #
+  #     edge_dsts = [edge for (name, edge) in netlist.graph.edges.items()
+  #                  if edge.dst.node_id == port.name and edge.dst.portName == port.portName]
+  #
+  #     if node_port.array and edge_dsts:  # if array and a edge target, considered a request
+  #       net_ports.append(f"self.{port.name}.{port.portName}.request()")
+  #     else:
+  #       net_ports.append(f"self.{port.name}.{port.portName}")
+  #   code += f"    self.connect({', '.join(net_ports)})\n"
 
   return code
 
