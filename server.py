@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from flask import Flask, jsonify, request, make_response
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from pydantic import BaseModel, ValidationError
 
 from netlist_compiler import JsonNetlist, compile_netlist
@@ -21,6 +21,7 @@ def version():
   return "0.3"
 
 @app.route("/compile", methods=['POST', 'OPTIONS'])
+@cross_origin(origins=['*'])
 def compile():
   try:
     json_netlist = JsonNetlist.model_validate_json(request.get_data())
