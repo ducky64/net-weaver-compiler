@@ -1,4 +1,4 @@
-from typing import Any, cast, Tuple, List
+from typing import Any, cast, Tuple, List, Optional
 from pydantic import BaseModel
 
 import sys
@@ -23,7 +23,8 @@ class JsonNodePort(BaseModel):
 class JsonNodeArgParam(BaseModel):
   name: str  # name of parameter (consistent w/ HDL)
   type: str  # type of parameter, ...
-  defaultValue: Any  # value of parameter
+  default_value: Optional[Any]  # default value of parameter in library, if any
+  value: Optional[Any]  # value as specified by the user
 
 class JsonNodeData(BaseModel):
   name: str  # ???
@@ -58,15 +59,9 @@ class JsonNetlist(BaseModel):
   graphUIData: Any  # ignored
 
 
-def compile_netlist(netlist: JsonNetlist) -> Tuple[str, List[str]]:
-  """Compiles the JsonNetlist to a KiCad netlist, returning the KiCad netlist along with a list of model
-  validation errors (if any)."""
+def tohdl_netlist(netlist: JsonNetlist) -> str:
+  """Compiles the JsonNetlist to HDL, returning the HDL code."""
   code = f"""\
-import os
-os.chdir(edg_dir)
-
-from edg import *
-        
 class MyModule(JlcBoardTop):
   def __init__(self):
     super().__init__()
@@ -78,7 +73,12 @@ class MyModule(JlcBoardTop):
     assert node_name.isidentifier(), f"non-identifier block name {node_name}"
     block_class = node.data.type
     assert block_class.isidentifier(), f"non-identifier block class {block_class}"
-    code += f"    self.{node_name} = self.Block({block_class}())\n"
+
+    args_str = ""
+    for arg_param in node.data.argParams:
+      if arg_param.default_value != arg_param.value and arg_param.value:
+        args_str += f", {arg_param.name}={arg_param.value}"
+    code += f"    self.{node_name} = self.Block({block_class}(){args_str})\n"
   code += "\n"
 
   for net in netlist.nets:
@@ -102,7 +102,23 @@ class MyModule(JlcBoardTop):
     code += f"    self.connect({', '.join(net_ports)})\n"
   code += "\n"
 
-  code += """\
+  return code
+
+def compile_netlist(netlist: JsonNetlist) -> Tuple[str, List[str]]:
+  """Compiles the JsonNetlist to a KiCad netlist, returning the KiCad netlist along with a list of model
+  validation errors (if any)."""
+  code = f"""\
+import os
+os.chdir(edg_dir)
+
+from edg import *
+
+"""
+        
+  code += tohdl_netlist(netlist)
+
+  code += """
+
 compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
 compiled.append_values(RefdesRefinementPass().run(compiled))
 netlist_all = NetlistBackend().run(compiled)
