@@ -1,4 +1,4 @@
-from typing import Any, cast, Tuple, List, Optional
+from typing import Any, cast, Tuple, Optional
 from pydantic import BaseModel
 
 import sys
@@ -62,7 +62,7 @@ class JsonNetlist(BaseModel):
   nets: list[list[JsonNetPort]]
   graph: JsonGraph
   graphUIData: Any  # ignored
-  labels: dict[str, JsonLabel]
+  labels: dict[str, JsonLabel] = {}  # labels, if any - new feature
 
 
 def tohdl_netlist(netlist: JsonNetlist) -> str:
@@ -100,10 +100,22 @@ class MyModule(JlcBoardTop):
     code += f"    self.{node_name} = self.Block({block_class}({', '.join(args_elts)}))\n"
   code += "\n"
 
-  for name, label in netlist.labels.items():
-    print(name)
-    pass
+  labels_by_name: dict[str, list[JsonLabel]] = { }
+  if netlist.labels:
+    for id, label in netlist.labels.items():
+      labels_by_name.setdefault(label.labelName, []).append(label)
 
+  # generate labels first
+  for name, labels in labels_by_name.items():
+    port_hdls = []
+    for label in labels:
+      port_node = netlist.graph.nodes[label.nodeId]
+      port_port = port_node.data.ports[label.portIdx].name
+      port_hdls.append(f"self.{label.nodeId}.{port_port}")
+
+    code += f"    self.connect({', '.join(port_hdls)})\n"
+
+  # then directed edges
   for name, edge in netlist.graph.edges.items():
     src_node = netlist.graph.nodes[edge.src.node_id]
     src_port = src_node.data.ports[edge.src.idx]
@@ -111,35 +123,17 @@ class MyModule(JlcBoardTop):
     dst_port = dst_node.data.ports[edge.dst.idx]
 
     src_hdl = f"self.{edge.src.node_id}.{src_port.name}"
-    if dst_port.array:
-      dst_hdl = f"self.{edge.src.node_id}.{src_port.name}.request()"
+    if src_port.array and dst_port.array:
+      dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request_vector()"
+    elif not src_port.array and dst_port.array:
+      dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request()"
     else:
-      dst_hdl = f"self.{edge.src.node_id}.{src_port.name}"
+      dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}"
     code += f"    self.connect({src_hdl}, {dst_hdl})\n"
-
-  # for net in netlist.nets:
-  #   net_ports = []
-  #   for port in net:
-  #     assert port.name.isidentifier(), f"non-identifier block reference {port.name}"
-  #     assert port.portName.isidentifier(), f"non-identifier port reference {port.portName}"
-  #
-  #     node = netlist.graph.nodes[port.name]
-  #     node_ports = [node_port for node_port in node.data.ports if node_port.name == port.portName]
-  #     assert len(node_ports) == 1
-  #     node_port = node_ports[0]
-  #
-  #     edge_dsts = [edge for (name, edge) in netlist.graph.edges.items()
-  #                  if edge.dst.node_id == port.name and edge.dst.portName == port.portName]
-  #
-  #     if node_port.array and edge_dsts:  # if array and a edge target, considered a request
-  #       net_ports.append(f"self.{port.name}.{port.portName}.request()")
-  #     else:
-  #       net_ports.append(f"self.{port.name}.{port.portName}")
-  #   code += f"    self.connect({', '.join(net_ports)})\n"
 
   return code
 
-def compile_netlist(netlist: JsonNetlist) -> Tuple[str, List[str]]:
+def compile_netlist(netlist: JsonNetlist) -> Tuple[str, list[str]]:
   """Compiles the JsonNetlist to a KiCad netlist, returning the KiCad netlist along with a list of model
   validation errors (if any)."""
   code = f"""\

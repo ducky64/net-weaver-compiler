@@ -179,8 +179,8 @@
               "type": "range",
               "default_value": null,
               "value": [
-                1,
-                3
+                3.0,
+                3.6
               ]
             }
           ]
@@ -439,16 +439,6 @@
     "QP1e6TeV": {
       "labelName": "gnd",
       "nodeId": "_n3w58oKp",
-      "portIdx": 2
-    },
-    "ggmiUAja": {
-      "labelName": "usb",
-      "nodeId": "_UJOuhuHr",
-      "portIdx": 5
-    },
-    "YN5qYFIa": {
-      "labelName": "usb",
-      "nodeId": "_QGZd05Ri",
       "portIdx": 2
     }
   }
