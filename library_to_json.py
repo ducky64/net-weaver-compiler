@@ -118,8 +118,8 @@ class TypeHierarchyNode(BaseModel):
   name: str
   children: list['TypeHierarchyNode']
 
-class LibraryJson(RootModel):
-  root: list[BlockJsonDict]
+class LibraryJson(BaseModel):
+  blocks: list[BlockJsonDict]
   typeHierarchyTree: TypeHierarchyNode
 
 
@@ -244,7 +244,30 @@ if __name__ == '__main__':
 
     count += 1
 
-  library_json = LibraryJson(root=all_blocks)
+  hierarchy_seen: set[str] = set()
+
+  def sort_hierarchy_list(in_list: list[TypeHierarchyNode]) -> list[TypeHierarchyNode]:
+    return list(sorted(in_list, key=lambda elt: elt.name))
+
+  def generate_hierarchy_node(node_name: str) -> TypeHierarchyNode:
+    hierarchy_seen.add(node_name)
+    return TypeHierarchyNode(
+      name=node_name,
+      children=sort_hierarchy_list(
+        [generate_hierarchy_node(child) for child in subclasses.get(node_name, [])]
+      )
+    )
+
+  root_hierarchy_elts = sort_hierarchy_list(
+    [generate_hierarchy_node(child) for child in subclasses.get('', [])]
+  )
+  unseen = subclasses.keys() - hierarchy_seen - {'', 'Block'}
+  print(f"Missing from type hierarchy: {unseen}")
+
+  library_json = LibraryJson(
+    blocks=all_blocks,
+    typeHierarchyTree=TypeHierarchyNode(name='', children=root_hierarchy_elts)
+  )
 
   print(f"Writing {count} classes to {OUTPUT_FILE}")
 
