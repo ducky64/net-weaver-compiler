@@ -118,6 +118,7 @@ class TypeHierarchyNode(BaseModel):
   name: str
   children: list['TypeHierarchyNode']
 
+
 class LibraryJson(BaseModel):
   blocks: list[BlockJsonDict]
   typeHierarchyTree: TypeHierarchyNode
