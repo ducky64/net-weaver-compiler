@@ -65,6 +65,14 @@ class JsonNetlist(BaseModel):
   labels: dict[str, JsonLabel] = {}  # labels, if any - new feature
 
 
+class CompilerResult(BaseModel):
+  kicadNetlist: Optional[str] = None
+  svgpcbFunctions: Optional[str] = None
+  svgpcbInstantiations: Optional[str] = None
+  svgpcbNetlist: Optional[str] = None
+  errors: list[str] = []
+
+
 def tohdl_netlist(netlist: JsonNetlist) -> str:
   """Compiles the JsonNetlist to HDL, returning the HDL code."""
   code = f"""\
@@ -133,7 +141,7 @@ class MyModule(JlcBoardTop):
 
   return code
 
-def compile_netlist(netlist: JsonNetlist) -> Tuple[str, list[str]]:
+def compile_netlist(netlist: JsonNetlist) -> CompilerResult:
   """Compiles the JsonNetlist to a KiCad netlist, returning the KiCad netlist along with a list of model
   validation errors (if any)."""
   code = f"""\
@@ -151,17 +159,27 @@ from edg import *
 compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
 compiled.append_values(RefdesRefinementPass().run(compiled))
 netlist_all = NetlistBackend().run(compiled)
-netlist = netlist_all[0][1]"""
+netlist = netlist_all[0][1]
+svgpcb_all = SvgPcbBackend().run(compiled)
+svgpcb_functions = svgpcb_all[0][1]
+svgpcb_instantiations = svgpcb_all[1][1]
+svgpcb_netlist = svgpcb_all[2][1]
+"""
 
   exec_env = {
     'edg_dir': os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks')
   }
   exec(code, exec_env)
 
-  compiled_netlist = cast(str, exec_env['netlist'])
   compiled = cast(edg_core.ScalaCompilerInterface.CompiledDesign, exec_env['compiled'])
-
-  if compiled.error:
-    return compiled_netlist, [compiled.error]
+  if compiled.error:  # TODO plumb through structured errors instead of relying on strings
+    errors = [compiled.error]
   else:
-    return compiled_netlist, []
+    errors = []
+  return CompilerResult(
+    kicadNetlist=cast(str, exec_env['netlist']),
+    svgpcbFunctions=cast(str, exec_env['svgpcb_functions']),
+    svgpcbInstantiations=cast(str, exec_env['svgpcb_instantiations']),
+    svgpcbNetlist=cast(str, exec_env['svgpcb_netlist']),
+    errors=errors
+  )

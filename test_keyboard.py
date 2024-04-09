@@ -31,5 +31,5 @@ class KeyboardTestCase(unittest.TestCase):
     hdl = tohdl_netlist(netlist)
     self.assertEqual(hdl, EXPECTED_HDL)
 
-    compiled, errs = compile_netlist(netlist)  # just check it doesn't error out
-    self.assertEqual(errs, [])
+    result = compile_netlist(netlist)  # just check it doesn't error out
+    self.assertEqual(result.errors, [])

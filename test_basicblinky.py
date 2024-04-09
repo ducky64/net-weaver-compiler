@@ -92,6 +92,60 @@ EXPECTED_NETLIST = """\
   (node (ref _t42BdSzQ.package) (pin 1))))
 )"""
 
+EXPECTED_SVGPCB_FUNCTIONS = ""
+
+EXPECTED_SVGPCB_INSTANTIATIONS = """\
+const _p5zNfcKi = board.add(Nucleo32, {
+  translate: pt(0, 0), rotate: 0,
+  id: '_p5zNfcKi'
+})
+const _t42BdSzQ_package = board.add(LED_0603_1608Metric, {
+  translate: pt(0, 0), rotate: 0,
+  id: '_t42BdSzQ_package'
+})
+const _t42BdSzQ_res = board.add(R_0603_1608Metric, {
+  translate: pt(0, 0), rotate: 0,
+  id: '_t42BdSzQ_res'
+})
+const jlc_th_th1 = board.add(JlcToolingHole_1_152mm, {
+  translate: pt(0, 0), rotate: 0,
+  id: 'jlc_th_th1'
+})
+const jlc_th_th2 = board.add(JlcToolingHole_1_152mm, {
+  translate: pt(0, 0), rotate: 0,
+  id: 'jlc_th_th2'
+})
+const jlc_th_th3 = board.add(JlcToolingHole_1_152mm, {
+  translate: pt(0, 0), rotate: 0,
+  id: 'jlc_th_th3'
+})
+"""
+
+EXPECTED_SVGPCB_NETLIST = """\
+board.setNetlist([
+  {
+    name: "_t42BdSzQ.signal",
+    pads: [["_p5zNfcKi", "10"], ["_t42BdSzQ_package", "2"]]
+  },
+  {
+    name: "_p5zNfcKi.gnd_out",
+    pads: [["_p5zNfcKi", "4"], ["_p5zNfcKi", "17"], ["_t42BdSzQ_res", "2"]]
+  },
+  {
+    name: "_p5zNfcKi.pwr_out",
+    pads: [["_p5zNfcKi", "29"]]
+  },
+  {
+    name: "_p5zNfcKi.vusb_out",
+    pads: [["_p5zNfcKi", "19"]]
+  },
+  {
+    name: "_t42BdSzQ.res.a",
+    pads: [["_t42BdSzQ_res", "1"], ["_t42BdSzQ_package", "1"]]
+  }
+])
+"""
+
 class BasicBlinkyTestCase(unittest.TestCase):
   def test_compile(self):
     # the server messes with cwd so we need to use the absolute path
@@ -105,3 +159,7 @@ class BasicBlinkyTestCase(unittest.TestCase):
       self.assertEqual(response.status_code, 200)
       self.assertEqual(response.json['errors'], [])
       self.assertEqual(response.json['kicadNetlist'], EXPECTED_NETLIST)
+
+      self.assertEqual(response.json['svgpcbFunctions'], EXPECTED_SVGPCB_FUNCTIONS)
+      self.assertEqual(response.json['svgpcbInstantiations'], EXPECTED_SVGPCB_INSTANTIATIONS)
+      self.assertEqual(response.json['svgpcbNetlist'], EXPECTED_SVGPCB_NETLIST)
