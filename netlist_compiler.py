@@ -159,7 +159,7 @@ class MyModule(SimpleBoardTop):
 FOOTPRINT_LIBRARY_RELPATHS = [
   'footprints/kicad-footprints',
   'footprints/kiswitch/library/footprints',
-  'footprints/kicad-footprints/OPL_Kicad_Library',
+  'footprints/OPL_Kicad_Library',
   'PolymorphicBlocks/examples',
 ]
 
