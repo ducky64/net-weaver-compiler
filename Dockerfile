@@ -12,7 +12,7 @@ RUN pip install -r requirements.txt
 
 COPY PolymorphicBlocks/ ./PolymorphicBlocks/
 
-COPY server.py netlist_compiler.py PolymorphicBlocks ./
+COPY server.py netlist_compiler.py svgpcb_compiler.py PolymorphicBlocks ./
 ENV FLASK_APP=server.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
