@@ -5,7 +5,7 @@ from netlist_compiler import tohdl_netlist, compile_netlist, JsonNetlist
 
 
 EXPECTED_HDL = """\
-class MyModule(JlcBoardTop):
+class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 

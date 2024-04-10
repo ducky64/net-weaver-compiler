@@ -90,7 +90,7 @@ class CompilerResult(BaseModel):
 def tohdl_netlist(netlist: JsonNetlist) -> str:
   """Compiles the JsonNetlist to HDL, returning the HDL code."""
   code = f"""\
-class MyModule(JlcBoardTop):
+class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 """

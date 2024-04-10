@@ -49,40 +49,7 @@ EXPECTED_KICAD_NETLIST = """\
   (property (name "edg_refdes") (value "R1"))
   (property (name "edg_part") (value "0603WAF1001T5E (UNI-ROYAL(Uniroyal Elec))"))
   (sheetpath (names "/_t42BdSzQ/") (tstamps "/0eb002fe/"))
-  (tstamps "0296014b"))
-(comp (ref "jlc_th.th1")
-  (value "")
-  (footprint "edg:JlcToolingHole_1.152mm")
-  (property (name "Sheetname") (value "jlc_th"))
-  (property (name "Sheetfile") (value "edg.BoardTop.JlcToolingHoles"))
-  (property (name "edg_path") (value "jlc_th.th1"))
-  (property (name "edg_short_path") (value "jlc_th.th1"))
-  (property (name "edg_refdes") (value "H1"))
-  (property (name "edg_part") (value ""))
-  (sheetpath (names "/jlc_th/") (tstamps "/08970275/"))
-  (tstamps "0260010e"))
-(comp (ref "jlc_th.th2")
-  (value "")
-  (footprint "edg:JlcToolingHole_1.152mm")
-  (property (name "Sheetname") (value "jlc_th"))
-  (property (name "Sheetfile") (value "edg.BoardTop.JlcToolingHoles"))
-  (property (name "edg_path") (value "jlc_th.th2"))
-  (property (name "edg_short_path") (value "jlc_th.th2"))
-  (property (name "edg_refdes") (value "H2"))
-  (property (name "edg_part") (value ""))
-  (sheetpath (names "/jlc_th/") (tstamps "/08970275/"))
-  (tstamps "0261010f"))
-(comp (ref "jlc_th.th3")
-  (value "")
-  (footprint "edg:JlcToolingHole_1.152mm")
-  (property (name "Sheetname") (value "jlc_th"))
-  (property (name "Sheetfile") (value "edg.BoardTop.JlcToolingHoles"))
-  (property (name "edg_path") (value "jlc_th.th3"))
-  (property (name "edg_short_path") (value "jlc_th.th3"))
-  (property (name "edg_refdes") (value "H3"))
-  (property (name "edg_part") (value ""))
-  (sheetpath (names "/jlc_th/") (tstamps "/08970275/"))
-  (tstamps "02620110")))
+  (tstamps "0296014b")))
 (nets
 (net (code 1) (name "_t42BdSzQ.signal")
   (node (ref _p5zNfcKi) (pin 10))
@@ -115,18 +82,6 @@ const _t42BdSzQ_res = board.add(R_0603_1608Metric, {
   translate: pt(0, 0), rotate: 0,
   id: '_t42BdSzQ_res'
 })
-const jlc_th_th1 = board.add(JlcToolingHole_1_152mm, {
-  translate: pt(0, 0), rotate: 0,
-  id: 'jlc_th_th1'
-})
-const jlc_th_th2 = board.add(JlcToolingHole_1_152mm, {
-  translate: pt(0, 0), rotate: 0,
-  id: 'jlc_th_th2'
-})
-const jlc_th_th3 = board.add(JlcToolingHole_1_152mm, {
-  translate: pt(0, 0), rotate: 0,
-  id: 'jlc_th_th3'
-})
 """
 
 EXPECTED_SVGPCB_FUNCTIONS = [
@@ -136,11 +91,7 @@ EXPECTED_SVGPCB_INSTANTIATIONS = [
   "const _p5zNfcKi = board.add(Nucleo32, {\ntranslate: pt(0, 0), rotate: 0,\nid: '_p5zNfcKi'\n})",
   "const _t42BdSzQ_package = board.add(LED_0603_1608Metric, {\ntranslate: pt(0, 0), rotate: 0,\nid: '_t42BdSzQ_package'\n})",
   "const _t42BdSzQ_res = board.add(R_0603_1608Metric, {\ntranslate: pt(0, 0), rotate: 0,\nid: '_t42BdSzQ_res'\n})",
-  "const jlc_th_th1 = board.add(JlcToolingHole_1_152mm, {\ntranslate: pt(0, 0), rotate: 0,\nid: 'jlc_th_th1'\n})",
-  "const jlc_th_th2 = board.add(JlcToolingHole_1_152mm, {\ntranslate: pt(0, 0), rotate: 0,\nid: 'jlc_th_th2'\n})",
-  "const jlc_th_th3 = board.add(JlcToolingHole_1_152mm, {\ntranslate: pt(0, 0), rotate: 0,\nid: 'jlc_th_th3'\n})"
 ]
-
 
 
 class BasicBlinkyTestCase(unittest.TestCase):
