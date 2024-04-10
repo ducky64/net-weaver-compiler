@@ -10,7 +10,7 @@ RUN pip install -r PolymorphicBlocks/requirements.txt
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
-COPY foorprints/ ./footprints/
+COPY footprints/ ./footprints/
 
 COPY PolymorphicBlocks/ ./PolymorphicBlocks/
 
