@@ -6,7 +6,7 @@ import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
 import edg_core
 
-from svgpcb_compiler import SvgPcbBackend
+import svgpcb_compiler
 
 
 class JsonNetPort(BaseModel):
@@ -202,6 +202,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
     for net in netlist.nets]
 
   # generate SVGPCB data
+  svgpcb_result = svgpcb_compiler.run(compiled)
 
   if compiled.error:  # TODO plumb through structured errors instead of relying on strings
     errors = [compiled.error]
@@ -210,8 +211,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
   return CompilerResult(
     netlist=nets_obj,
     kicadNetlist=cast(str, kicad_netlist),
-    # svgpcbFunctions=cast(str, exec_env['svgpcb_functions']),
-    # svgpcbInstantiations=cast(str, exec_env['svgpcb_instantiations']),
-    # svgpcbNetlist=cast(str, exec_env['svgpcb_netlist']),
+    svgpcbFunctions=svgpcb_result.functions,
+    svgpcbInstantiations=svgpcb_result.instantiations,
     errors=errors
   )

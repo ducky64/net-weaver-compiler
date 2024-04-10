@@ -129,6 +129,19 @@ const jlc_th_th3 = board.add(JlcToolingHole_1_152mm, {
 })
 """
 
+EXPECTED_SVGPCB_FUNCTIONS = [
+]
+
+EXPECTED_SVGPCB_INSTANTIATIONS = [
+  "const _p5zNfcKi = board.add(Nucleo32, {\ntranslate: pt(0, 0), rotate: 0,\nid: '_p5zNfcKi'\n})",
+  "const _t42BdSzQ_package = board.add(LED_0603_1608Metric, {\ntranslate: pt(0, 0), rotate: 0,\nid: '_t42BdSzQ_package'\n})",
+  "const _t42BdSzQ_res = board.add(R_0603_1608Metric, {\ntranslate: pt(0, 0), rotate: 0,\nid: '_t42BdSzQ_res'\n})",
+  "const jlc_th_th1 = board.add(JlcToolingHole_1_152mm, {\ntranslate: pt(0, 0), rotate: 0,\nid: 'jlc_th_th1'\n})",
+  "const jlc_th_th2 = board.add(JlcToolingHole_1_152mm, {\ntranslate: pt(0, 0), rotate: 0,\nid: 'jlc_th_th2'\n})",
+  "const jlc_th_th3 = board.add(JlcToolingHole_1_152mm, {\ntranslate: pt(0, 0), rotate: 0,\nid: 'jlc_th_th3'\n})"
+]
+
+
 
 class BasicBlinkyTestCase(unittest.TestCase):
   def test_compile(self):
@@ -144,12 +157,6 @@ class BasicBlinkyTestCase(unittest.TestCase):
       self.assertEqual(response.json['errors'], [])
       self.assertEqual(response.json['netlist'], EXPECTED_NETLIST)
       self.assertEqual(response.json['kicadNetlist'], EXPECTED_KICAD_NETLIST)
-
-      print(response.json['netlist'])
-      print(response.json['kicadFootprints'])
-
-      print(response.json['svgpcbFunctions'])
-      print(response.json['svgpcbInstantiations'])
 
       self.assertEqual(response.json['svgpcbFunctions'], EXPECTED_SVGPCB_FUNCTIONS)
       self.assertEqual(response.json['svgpcbInstantiations'], EXPECTED_SVGPCB_INSTANTIATIONS)
