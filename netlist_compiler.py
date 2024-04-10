@@ -181,12 +181,6 @@ from edg import *
 
 compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
 compiled.append_values(RefdesRefinementPass().run(compiled))
-# netlist_all = NetlistBackend().run(compiled)
-# netlist = netlist_all[0][1]
-# svgpcb_all = SvgPcbBackend().run(compiled)
-# svgpcb_functions = svgpcb_all[0][1]
-# svgpcb_instantiations = svgpcb_all[1][1]
-# svgpcb_netlist = svgpcb_all[2][1]
 """
 
   exec_env = {
