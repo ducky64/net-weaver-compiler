@@ -6,7 +6,15 @@ from server import app
 app.testing = True
 
 
-EXPECTED_NETLIST = """\
+EXPECTED_NETLIST = [
+  {'name': '_t42BdSzQ.signal', 'pads': [['_p5zNfcKi', '10'], ['_t42BdSzQ_package', '2']]},
+  {'name': '_p5zNfcKi.gnd_out', 'pads': [['_p5zNfcKi', '4'], ['_p5zNfcKi', '17'], ['_t42BdSzQ_res', '2']]},
+  {'name': '_p5zNfcKi.pwr_out', 'pads': [['_p5zNfcKi', '29']]},
+  {'name': '_p5zNfcKi.vusb_out', 'pads': [['_p5zNfcKi', '19']]},
+  {'name': '_t42BdSzQ.res.a', 'pads': [['_t42BdSzQ_res', '1'], ['_t42BdSzQ_package', '1']]}
+]
+
+EXPECTED_KICAD_NETLIST = """\
 (export (version D)
 (components
 (comp (ref "_p5zNfcKi")
@@ -121,30 +129,6 @@ const jlc_th_th3 = board.add(JlcToolingHole_1_152mm, {
 })
 """
 
-EXPECTED_SVGPCB_NETLIST = """\
-board.setNetlist([
-  {
-    name: "_t42BdSzQ.signal",
-    pads: [["_p5zNfcKi", "10"], ["_t42BdSzQ_package", "2"]]
-  },
-  {
-    name: "_p5zNfcKi.gnd_out",
-    pads: [["_p5zNfcKi", "4"], ["_p5zNfcKi", "17"], ["_t42BdSzQ_res", "2"]]
-  },
-  {
-    name: "_p5zNfcKi.pwr_out",
-    pads: [["_p5zNfcKi", "29"]]
-  },
-  {
-    name: "_p5zNfcKi.vusb_out",
-    pads: [["_p5zNfcKi", "19"]]
-  },
-  {
-    name: "_t42BdSzQ.res.a",
-    pads: [["_t42BdSzQ_res", "1"], ["_t42BdSzQ_package", "1"]]
-  }
-])
-"""
 
 class BasicBlinkyTestCase(unittest.TestCase):
   def test_compile(self):
@@ -158,7 +142,8 @@ class BasicBlinkyTestCase(unittest.TestCase):
 
       self.assertEqual(response.status_code, 200)
       self.assertEqual(response.json['errors'], [])
-      self.assertEqual(response.json['kicadNetlist'], EXPECTED_NETLIST)
+      self.assertEqual(response.json['netlist'], EXPECTED_NETLIST)
+      self.assertEqual(response.json['kicadNetlist'], EXPECTED_KICAD_NETLIST)
 
       print(response.json['netlist'])
       print(response.json['kicadFootprints'])

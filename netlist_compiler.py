@@ -75,7 +75,7 @@ class KicadFootprint(BaseModel):
 
 class ResultNet(BaseModel):
   name: str
-  pads: list[list[str]]
+  pads: list[list[str]]  # nested list is [block name, pin name]
 
 
 class CompilerResult(BaseModel):
@@ -194,11 +194,21 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
   netlist = NetlistTransform(compiled).run()
   kicad_netlist = generate_netlist(netlist, True)
 
+  # generate structured netlist
+  netlist_block_dict = {block.full_path: block for block in netlist.blocks}
+  nets_obj = [ResultNet(
+    name=net.name,
+    pads=[['_'.join(netlist_block_dict[pin.block_path].path), pin.pin_name] for pin in net.pins])
+    for net in netlist.nets]
+
+  # generate SVGPCB data
+
   if compiled.error:  # TODO plumb through structured errors instead of relying on strings
     errors = [compiled.error]
   else:
     errors = []
   return CompilerResult(
+    netlist=nets_obj,
     kicadNetlist=cast(str, kicad_netlist),
     # svgpcbFunctions=cast(str, exec_env['svgpcb_functions']),
     # svgpcbInstantiations=cast(str, exec_env['svgpcb_instantiations']),
