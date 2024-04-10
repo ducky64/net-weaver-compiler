@@ -1,3 +1,12 @@
 [submodule "PolymorphicBlocks"]
 	path = PolymorphicBlocks
 	url = https://github.com/BerkeleyHCI/PolymorphicBlocks
+[submodule "footprints/kicad-footprints"]
+	path = footprints/kicad-footprints
+	url = https://gitlab.com/kicad/libraries/kicad-footprints.git
+[submodule "footprints/OPL_Kicad_Library"]
+	path = footprints/OPL_Kicad_Library
+	url = https://github.com/Seeed-Studio/OPL_Kicad_Library.git
+[submodule "footprints/kiswitch"]
+	path = footprints/kiswitch
+	url = https://github.com/kiswitch/kiswitch.git
