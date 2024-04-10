@@ -239,7 +239,9 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
         break
 
     if footprint_data is not None:
-      all_footprints.append(KicadFootprint(library=footprint, name=name, data=footprint_data))
+      all_footprints.append(KicadFootprint(library=footprint,
+                                           name=SvgPcbTemplateBlock._svgpcb_footprint_to_svgpcb(footprint),
+                                           data=footprint_data))
     else:
       print(f"failed to resolve footprint {footprint}")
 
