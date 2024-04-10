@@ -68,8 +68,8 @@ class JsonNetlist(BaseModel):
 
 
 class KicadFootprint(BaseModel):
-  library: str  # library name, first part of a KiCad footprint full name
-  name: str  # name (within a library), second part of a KiCad footprint full name
+  library: str  # full library name, including the library and the footprint
+  name: str  # JS name, containing only the second part of the library name and with character replacements (eg . -> _)
   data: str  # raw Kicad .kicad_mod data
 
 
@@ -158,7 +158,7 @@ class MyModule(SimpleBoardTop):
 
 EXAMPLE_KICAD_FOOTPRINTS = [
   KicadFootprint(
-    library="Diode_SMD",
+    library="Diode_SMD:D_SMA",
     name="D_SMA",
     data="""\
 (footprint D_SMA (version 20210108) (generator KicadMod) (layer F.Cu) (tedit 63CB70A4)
