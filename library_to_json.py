@@ -107,11 +107,11 @@ class ParamJsonDict(BaseModel):
 class BlockJsonDict(BaseModel):
   name: str  # name in superblock - empty for libraries
   type: str  # type of self
-  superClasses: list[str]  # superclasses of self
+  superClasses: list[str] = []  # superclasses of self
   ports: list[PortJsonDict]
-  argParams: list[ParamJsonDict]
-  is_abstract: bool
-  docstring: Optional[str]  # docstring for the block, if any
+  argParams: list[ParamJsonDict] = []
+  is_abstract: bool = False
+  docstring: Optional[str] = ""  # docstring for the block, if any
 
 
 class TypeHierarchyNode(BaseModel):
@@ -121,6 +121,7 @@ class TypeHierarchyNode(BaseModel):
 
 class LibraryJson(BaseModel):
   blocks: list[BlockJsonDict]
+  links: list[BlockJsonDict]
   typeHierarchyTree: TypeHierarchyNode
 
 
@@ -132,6 +133,7 @@ if __name__ == '__main__':
   pb = edgir.Library()
 
   all_blocks = []
+  all_links = []
 
   subclasses: dict[str, list[str]] = {}  # superclass -> [subclasses]
 
@@ -145,9 +147,6 @@ if __name__ == '__main__':
     if isinstance(obj, edg_core.Block):
       print(f"Elaborating block {name}")
       block_proto = builder.elaborate_toplevel(obj)
-      # convert IR to JsonDict
-
-      ports = [pb_to_port(pair) for pair in block_proto.ports]
 
       # inspect into the args to get ArgParams
       argParams = []
@@ -221,7 +220,7 @@ if __name__ == '__main__':
         name="",  # empty for libraries
         type=simpleName(block_proto.self_class),
         superClasses=[simpleName(superclass) for superclass in block_proto.superclasses],
-        ports=ports,
+        ports=[pb_to_port(pair) for pair in block_proto.ports],
         argParams=argParams,
         is_abstract=block_proto.is_abstract,
         docstring=inspect.getdoc(cls)
@@ -233,9 +232,17 @@ if __name__ == '__main__':
       if not block_proto.superclasses:  # no superclasses, add to root
         subclasses.setdefault('', []).append(simpleName(block_proto.self_class))
     elif isinstance(obj, edg_core.Link):
-      # link_proto = builder.elaborate_toplevel(obj)
-      # pb.root.members[name].link.CopyFrom(link_proto)
-      pass
+      link_proto = builder.elaborate_toplevel(obj)
+      pb.root.members[name].link.CopyFrom(link_proto)
+
+      link_dict = BlockJsonDict(
+        name="",  # empty for libraries
+        type=simpleName(link_proto.self_class),
+        ports=[pb_to_port(pair) for pair in link_proto.ports],
+        docstring=inspect.getdoc(cls)
+      )
+      all_links.append(link_dict)
+
     elif isinstance(obj, edg_core.Bundle):  # TODO: note Bundle extends Port, so this must come first
       # pb.root.members[name].bundle.CopyFrom(obj._def_to_proto())
       pass
@@ -267,6 +274,7 @@ if __name__ == '__main__':
 
   library_json = LibraryJson(
     blocks=all_blocks,
+    links=all_links,
     typeHierarchyTree=TypeHierarchyNode(name='', children=root_hierarchy_elts)
   )
 
