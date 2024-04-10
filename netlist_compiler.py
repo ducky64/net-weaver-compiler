@@ -156,55 +156,15 @@ class MyModule(SimpleBoardTop):
   return code
 
 
-EXAMPLE_KICAD_FOOTPRINTS = [
-  KicadFootprint(
-    library="Diode_SMD:D_SMA",
-    name="D_SMA",
-    data="""\
-(footprint D_SMA (version 20210108) (generator KicadMod) (layer F.Cu) (tedit 63CB70A4)
-  (descr "Diode SMA (DO-214AC)")
-  (tags "Diode SMA (DO-214AC)")
-  (attr smd)
-  (fp_text reference REF** (at 0 -2.5) (layer F.SilkS)
-    (effects (font (size 1 1) (thickness 0.15)))
-  )
-  (fp_text value D_SMA (at 0 2.6) (layer F.Fab)
-    (effects (font (size 1 1) (thickness 0.15)))
-  )
-  (fp_text user ${REFERENCE} (at 0 -2.5) (layer F.Fab)
-    (effects (font (size 1 1) (thickness 0.15)))
-  )
-  (fp_line (start -3.51 1.65) (end 2 1.65) (layer F.SilkS) (width 0.12))
-  (fp_line (start -3.51 -1.65) (end -3.51 1.65) (layer F.SilkS) (width 0.12))
-  (fp_line (start -3.51 -1.65) (end 2 -1.65) (layer F.SilkS) (width 0.12))
-  (fp_line (start 3.5 -1.75) (end 3.5 1.75) (layer F.CrtYd) (width 0.05))
-  (fp_line (start -3.5 1.75) (end -3.5 -1.75) (layer F.CrtYd) (width 0.05))
-  (fp_line (start -3.5 -1.75) (end 3.5 -1.75) (layer F.CrtYd) (width 0.05))
-  (fp_line (start 3.5 1.75) (end -3.5 1.75) (layer F.CrtYd) (width 0.05))
-  (fp_line (start 2.3 1.5) (end -2.3 1.5) (layer F.Fab) (width 0.1))
-  (fp_line (start 0.50118 0.75032) (end 0.50118 -0.79908) (layer F.Fab) (width 0.1))
-  (fp_line (start 2.3 -1.5) (end 2.3 1.5) (layer F.Fab) (width 0.1))
-  (fp_line (start -0.64944 0.00102) (end 0.50118 0.75032) (layer F.Fab) (width 0.1))
-  (fp_line (start 2.3 -1.5) (end -2.3 -1.5) (layer F.Fab) (width 0.1))
-  (fp_line (start 0.50118 0.00102) (end 1.4994 0.00102) (layer F.Fab) (width 0.1))
-  (fp_line (start -0.64944 0.00102) (end -1.55114 0.00102) (layer F.Fab) (width 0.1))
-  (fp_line (start -0.64944 -0.79908) (end -0.64944 0.80112) (layer F.Fab) (width 0.1))
-  (fp_line (start -0.64944 0.00102) (end 0.50118 -0.79908) (layer F.Fab) (width 0.1))
-  (fp_line (start -2.3 1.5) (end -2.3 -1.5) (layer F.Fab) (width 0.1))
-  (pad 1 smd roundrect (at -2 0) (size 2.5 1.8) (layers F.Cu F.Paste F.Mask) (roundrect_rratio 0.1388888889))
-  (pad 2 smd roundrect (at 2 0) (size 2.5 1.8) (layers F.Cu F.Paste F.Mask) (roundrect_rratio 0.1388888889))
-  (model ${KICAD6_3DMODEL_DIR}/Diode_SMD.3dshapes/D_SMA.wrl
-    (at (xyz 0 0 0))
-    (scale (xyz 1 1 1))
-    (rotate (xyz 0 0 0))
-  )
-)
-"""
-  )
+FOOTPRINT_LIBRARY_RELPATHS = [
+  'footprints/kicad-footprints',
+  'footprints/kiswitch/library/footprints',
+  'footprints/kicad-footprints/OPL_Kicad_Library',
+  'PolymorphicBlocks/examples',
 ]
 
 
-def compile_netlist(netlist: JsonNetlist) -> CompilerResult:
+def compile_netlist(netweave_netlist: JsonNetlist) -> CompilerResult:
   """Compiles the JsonNetlist to a KiCad netlist, returning the KiCad netlist along with a list of model
   validation errors (if any)."""
   code = f"""\
@@ -215,7 +175,7 @@ from edg import *
 
 """
         
-  code += tohdl_netlist(netlist)
+  code += tohdl_netlist(netweave_netlist)
 
   code += """
 
@@ -251,7 +211,37 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
     for net in netlist.nets]
 
   # fetch KiCad data
-  # TODO IMPLEMENT ME
+  all_block_footprints = []  # preserve ordering
+  for block in netlist.blocks:
+    if block.footprint not in all_block_footprints:
+      all_block_footprints.append(block.footprint)
+
+  all_footprints = []
+  for footprint in all_block_footprints:
+    footprint_split = footprint.split(':')
+    if len(footprint_split) != 2:
+      continue
+    library, name = footprint_split
+    footprint_data = None
+    for library_container in FOOTPRINT_LIBRARY_RELPATHS:
+      container_path = os.path.join(os.path.dirname(__file__), library_container)
+      footprint_candidates = [
+        os.path.join(container_path, library, name + '.kicad_mod'),
+        os.path.join(container_path, library + '.pretty', name + '.kicad_mod')
+      ]
+      for footprint_candidate in footprint_candidates:
+        if os.path.exists(footprint_candidate):
+          with open(footprint_candidate) as f:
+            footprint_data = f.read()
+          break
+
+      if footprint_data is not None:
+        break
+
+    if footprint_data is not None:
+      all_footprints.append(KicadFootprint(library=footprint, name=name, data=footprint_data))
+    else:
+      print(f"failed to resolve footprint {footprint}")
 
   # generate SVGPCB data
   svgpcb_result = svgpcb_compiler.run(compiled)
@@ -263,7 +253,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
   return CompilerResult(
     netlist=nets_obj,
     kicadNetlist=cast(str, kicad_netlist),
-    kicadFootprints=EXAMPLE_KICAD_FOOTPRINTS,
+    kicadFootprints=all_footprints,
     svgpcbFunctions=svgpcb_result.functions,
     svgpcbInstantiations=svgpcb_result.instantiations,
     errors=errors

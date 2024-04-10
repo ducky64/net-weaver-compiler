@@ -112,4 +112,3 @@ class BasicBlinkyTestCase(unittest.TestCase):
 
       self.assertEqual(response.json['svgpcbFunctions'], EXPECTED_SVGPCB_FUNCTIONS)
       self.assertEqual(response.json['svgpcbInstantiations'], EXPECTED_SVGPCB_INSTANTIATIONS)
-
