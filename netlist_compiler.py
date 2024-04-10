@@ -1,4 +1,4 @@
-from typing import Any, cast, Tuple, Optional
+from typing import Any, cast, Optional
 from pydantic import BaseModel
 
 import sys
@@ -65,11 +65,23 @@ class JsonNetlist(BaseModel):
   labels: dict[str, JsonLabel] = {}  # labels, if any - new feature
 
 
+class KicadFootprint(BaseModel):
+  library: str  # library name, first part of a KiCad footprint full name
+  name: str  # name (within a library), second part of a KiCad footprint full name
+  data: str  # raw Kicad .kicad_mod data
+
+
+class ResultNet(BaseModel):
+  name: str
+  pads: list[list[str]]
+
+
 class CompilerResult(BaseModel):
+  netlist: list[ResultNet] = []
   kicadNetlist: Optional[str] = None
-  svgpcbFunctions: Optional[str] = None
-  svgpcbInstantiations: Optional[str] = None
-  svgpcbNetlist: Optional[str] = None
+  kicadFootprints: Optional[list[KicadFootprint]] = None
+  svgpcbFunctions: Optional[list[str]] = None
+  svgpcbInstantiations: Optional[list[str]] = None
   errors: list[str] = []
 
 
