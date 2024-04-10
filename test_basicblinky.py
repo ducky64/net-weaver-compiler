@@ -160,6 +160,12 @@ class BasicBlinkyTestCase(unittest.TestCase):
       self.assertEqual(response.json['errors'], [])
       self.assertEqual(response.json['kicadNetlist'], EXPECTED_NETLIST)
 
+      print(response.json['netlist'])
+      print(response.json['kicadFootprints'])
+
+      print(response.json['svgpcbFunctions'])
+      print(response.json['svgpcbInstantiations'])
+
       self.assertEqual(response.json['svgpcbFunctions'], EXPECTED_SVGPCB_FUNCTIONS)
       self.assertEqual(response.json['svgpcbInstantiations'], EXPECTED_SVGPCB_INSTANTIATIONS)
-      self.assertEqual(response.json['svgpcbNetlist'], EXPECTED_SVGPCB_NETLIST)
+

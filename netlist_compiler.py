@@ -6,6 +6,8 @@ import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
 import edg_core
 
+from svgpcb_compiler import SvgPcbBackend
+
 
 class JsonNetPort(BaseModel):
   nodeId: str  # unused, internal node ID
@@ -170,12 +172,12 @@ from edg import *
 
 compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
 compiled.append_values(RefdesRefinementPass().run(compiled))
-netlist_all = NetlistBackend().run(compiled)
-netlist = netlist_all[0][1]
-svgpcb_all = SvgPcbBackend().run(compiled)
-svgpcb_functions = svgpcb_all[0][1]
-svgpcb_instantiations = svgpcb_all[1][1]
-svgpcb_netlist = svgpcb_all[2][1]
+# netlist_all = NetlistBackend().run(compiled)
+# netlist = netlist_all[0][1]
+# svgpcb_all = SvgPcbBackend().run(compiled)
+# svgpcb_functions = svgpcb_all[0][1]
+# svgpcb_instantiations = svgpcb_all[1][1]
+# svgpcb_netlist = svgpcb_all[2][1]
 """
 
   exec_env = {
@@ -184,14 +186,22 @@ svgpcb_netlist = svgpcb_all[2][1]
   exec(code, exec_env)
 
   compiled = cast(edg_core.ScalaCompilerInterface.CompiledDesign, exec_env['compiled'])
+
+  from electronics_model.NetlistGenerator import NetlistTransform
+  from electronics_model.footprint import generate_netlist
+  from edg import SvgPcbTemplateBlock
+
+  netlist = NetlistTransform(compiled).run()
+  kicad_netlist = generate_netlist(netlist, True)
+
   if compiled.error:  # TODO plumb through structured errors instead of relying on strings
     errors = [compiled.error]
   else:
     errors = []
   return CompilerResult(
-    kicadNetlist=cast(str, exec_env['netlist']),
-    svgpcbFunctions=cast(str, exec_env['svgpcb_functions']),
-    svgpcbInstantiations=cast(str, exec_env['svgpcb_instantiations']),
-    svgpcbNetlist=cast(str, exec_env['svgpcb_netlist']),
+    kicadNetlist=cast(str, kicad_netlist),
+    # svgpcbFunctions=cast(str, exec_env['svgpcb_functions']),
+    # svgpcbInstantiations=cast(str, exec_env['svgpcb_instantiations']),
+    # svgpcbNetlist=cast(str, exec_env['svgpcb_netlist']),
     errors=errors
   )
