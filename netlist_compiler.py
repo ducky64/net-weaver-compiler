@@ -240,7 +240,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
       print(f"failed to resolve footprint {footprint}")
 
   # generate SVGPCB data
-  svgpcb_result = svgpcb_compiler.run(compiled)
+  svgpcb_result = svgpcb_compiler.run(compiled, netlist)
 
   if compiled.error:  # TODO plumb through structured errors instead of relying on strings
     errors = [compiled.error]

@@ -4,7 +4,7 @@ from typing import List, Tuple, Dict, NamedTuple
 
 import edgir
 from edg_core import CompiledDesign, TransformUtil
-from electronics_model.NetlistGenerator import NetlistTransform, NetBlock
+from electronics_model.NetlistGenerator import NetlistTransform, NetBlock, Netlist
 from edg import SvgPcbTemplateBlock
 
 
@@ -16,8 +16,9 @@ class SvgPcbGeneratedBlock(NamedTuple):
 
 class SvgPcbTransform(TransformUtil.Transform):
   """Collects all SVGPCB blocks and initializes them."""
-  def __init__(self, design: CompiledDesign):
+  def __init__(self, design: CompiledDesign, netlist: Netlist):
     self.design = design
+    self.netlist = netlist
     self._svgpcb_blocks: List[SvgPcbGeneratedBlock] = []
 
   def visit_block(self, context: TransformUtil.TransformContext, block: edgir.BlockTypes) -> None:
@@ -32,7 +33,7 @@ class SvgPcbTransform(TransformUtil.Transform):
     cls = getattr(elt_module, elt_split[-1])
     if issubclass(cls, SvgPcbTemplateBlock):
       generator_obj = cls()
-      generator_obj._svgpcb_init(context.path, self.design)
+      generator_obj._svgpcb_init(context.path, self.design, self.netlist)
       self._svgpcb_blocks.append(SvgPcbGeneratedBlock(
         context.path, generator_obj._svgpcb_fn_name(), generator_obj._svgpcb_template()
       ))
@@ -49,7 +50,7 @@ class SvgPcbCompilerResult(NamedTuple):
   instantiations: list[str]
 
 
-def run(design: CompiledDesign) -> SvgPcbCompilerResult:
+def run(design: CompiledDesign, netlist: Netlist) -> SvgPcbCompilerResult:
   def block_matches_prefixes(block: NetBlock, prefixes: List[Tuple[str, ...]]):
     for prefix in prefixes:
       if block.full_path.blocks[0:min(len(block.full_path.blocks), len(prefix))] == prefix:
@@ -60,7 +61,7 @@ def run(design: CompiledDesign) -> SvgPcbCompilerResult:
     return [block for block in blocks
             if not block_matches_prefixes(block, exclude_prefixes)]
 
-  svgpcb_blocks = SvgPcbTransform(design).run()
+  svgpcb_blocks = SvgPcbTransform(design, netlist).run()
   svgpcb_block_prefixes = [block.path.to_tuple() for block in svgpcb_blocks]
   netlist = NetlistTransform(design).run()
   other_blocks = filter_blocks_by_pathname(netlist.blocks, svgpcb_block_prefixes)
