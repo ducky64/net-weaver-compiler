@@ -1,4 +1,5 @@
 # Simple tool that scans for libraries and dumps the whole thing to a proto file
+from itertools import chain
 from typing import Optional, List, Any, Union, Tuple
 import inspect
 from pydantic import BaseModel, RootModel
@@ -24,6 +25,10 @@ class PortJsonDict(BaseModel):
   type: str  # type of self; if array refers to the array element type
   is_array: bool
   hint_position: Optional[str]  # left | right | up | down | '' (empty)
+  hint_signal_direction: Optional[str]  # source | sink | bidir | passive | None
+  hint_array_direction: Optional[str]  # source | sink | bidir | None (if not is_array)
+  required: bool
+
 
 def port_to_dir(name: str, target: edgir.ref_pb2.LibraryPath) -> Optional[str]:
   simpleTarget = simpleName(target)
@@ -78,20 +83,146 @@ def port_to_dir(name: str, target: edgir.ref_pb2.LibraryPath) -> Optional[str]:
     print(f"unknown direction {simpleTarget}")
     return None
 
-def pb_to_port(pair: edgir.elem_pb2.NamedPortLike):
+
+def port_to_signal_dir(pair: edgir.elem_pb2.NamedPortLike) -> Optional[str]:
+  if pair.value.HasField('lib_elem'):
+    simpleTarget = simpleName(pair.value.lib_elem)
+  elif pair.value.HasField('array'):
+    simpleTarget = simpleName(pair.value.array.self_class)
+
+  if simpleTarget == 'Passive':
+    return 'passive'
+
+  elif simpleTarget == 'VoltageSource':
+    return 'source'
+  elif simpleTarget == 'VoltageSink':
+    return 'sink'
+
+  elif simpleTarget == 'DigitalSource':
+    return 'source'
+  elif simpleTarget == 'DigitalSingleSource':
+    return 'source'
+  elif simpleTarget == 'DigitalSink':
+    return 'sink'
+  elif simpleTarget == 'DigitalBidir':
+    return 'bidir'
+
+  elif simpleTarget == 'AnalogSource':
+    return 'source'
+  elif simpleTarget == 'AnalogSink':
+    return 'sink'
+  elif simpleTarget == 'AnalogBidir':
+    return 'bidir'
+
+  elif simpleTarget == 'I2cController':
+    return 'source'
+  elif simpleTarget == 'I2cPullupPort':
+    return 'passive'
+  elif simpleTarget == 'I2cTarget':
+    return 'sink'
+
+  elif simpleTarget == 'SpiController':
+    return 'source'
+  elif simpleTarget == 'SpiPeripheral':
+    return 'sink'
+
+  elif simpleTarget == 'UartPort':
+    return 'bidir'
+
+  elif simpleTarget == 'UsbHostPort':
+    return 'source'
+  elif simpleTarget == 'UsbDevicePort':
+    return 'sink'
+  elif simpleTarget == 'UsbPassivePort':
+    return 'passive'
+
+  elif simpleTarget == 'UsbCcPort':
+    return 'bidir'
+
+  elif simpleTarget == 'CanDiffPort':
+    return 'bidir'
+  elif simpleTarget == 'CanControllerPort':
+    return 'source'
+  elif simpleTarget == 'CanTransceiverPort':
+    return 'sink'
+  elif simpleTarget == 'CanPassivePort':
+    return 'passive'
+
+  elif simpleTarget == 'SwdHostPort':
+    return 'source'
+  elif simpleTarget == 'SwdTargetPort':
+    return 'sink'
+  elif simpleTarget == 'SwdPullPort':
+    return 'passive'
+
+  elif simpleTarget == 'I2sController':
+    return 'source'
+  elif simpleTarget == 'I2sTargetReceiver':
+    return 'sink'
+
+  elif simpleTarget == 'TouchDriver':
+    return 'sink'
+  elif simpleTarget == 'TouchPadPort':
+    return 'source'
+
+  elif simpleTarget == 'CrystalDriver':
+    return 'source'
+  elif simpleTarget == 'CrystalPort':
+    return 'sink'
+
+  elif simpleTarget == 'Dvp8Host':
+    return 'sink'
+  elif simpleTarget == 'Dvp8Camera':
+    return 'source'
+
+  elif simpleTarget == 'SpeakerDriverPort':
+    return 'source'
+  elif simpleTarget == 'SpeakerPort':
+    return 'sink'
+
+  elif simpleTarget == 'JacdacDataPort':
+    return 'bidir'
+  elif simpleTarget == 'JacdacPassivePort':
+    return 'passive'
+
+  else:
+    raise ValueError(f"unknown direction {simpleTarget} in {pair.name}")
+
+
+def pb_to_port(container: edgir.BlockLikeTypes, pair: edgir.elem_pb2.NamedPortLike):
+  constrs = [constraint_pair.value for constraint_pair in container.constraints]
+  required = bool([constr for constr in constrs
+                  if constr.HasField('ref') and len(constr.ref.steps) == 2 and constr.ref.steps[0].name == pair.name
+                   and constr.ref.steps[1].HasField('reserved_param')
+                   and constr.ref.steps[1].reserved_param == edgir.IS_CONNECTED])
+
   if pair.value.HasField('lib_elem'):
     return PortJsonDict(
       name=pair.name,
       type=simpleName(pair.value.lib_elem),
       is_array=False,
-      hint_position=port_to_dir(pair.name, pair.value.lib_elem)
+      hint_position=port_to_dir(pair.name, pair.value.lib_elem),
+      hint_signal_direction=port_to_signal_dir(pair),
+      hint_array_direction=None,
+      required=required
     )
   elif pair.value.HasField('array'):
+    # TODO: array directionality should be a IR construct exposed through the frontend
+    # this is a temporary hack to make things work
+    all_superclasses = list(chain(container.superclasses, container.super_superclasses, [container.self_class]))
+    if any(['IoController' in superclass.target.name for superclass in all_superclasses]):
+      hint_array_direction = 'sink'
+    else:
+      hint_array_direction = 'source'
+
     return PortJsonDict(
       name=pair.name,
       type=simpleName(pair.value.array.self_class),
       is_array=True,
-      hint_position=port_to_dir(pair.name, pair.value.array.self_class)
+      hint_position=port_to_dir(pair.name, pair.value.array.self_class),
+      hint_signal_direction=port_to_signal_dir(pair),
+      hint_array_direction=hint_array_direction,
+      required=required
     )
   else:
     raise ValueError(f"unknown pair value type ${pair.value}")
@@ -220,7 +351,7 @@ if __name__ == '__main__':
         name="",  # empty for libraries
         type=simpleName(block_proto.self_class),
         superClasses=[simpleName(superclass) for superclass in block_proto.superclasses],
-        ports=[pb_to_port(pair) for pair in block_proto.ports],
+        ports=[pb_to_port(block_proto, pair) for pair in block_proto.ports],
         argParams=argParams,
         is_abstract=block_proto.is_abstract,
         docstring=inspect.getdoc(cls)
@@ -238,7 +369,7 @@ if __name__ == '__main__':
       link_dict = BlockJsonDict(
         name="",  # empty for libraries
         type=simpleName(link_proto.self_class),
-        ports=[pb_to_port(pair) for pair in link_proto.ports],
+        ports=[pb_to_port(link_proto, pair) for pair in link_proto.ports],
         docstring=inspect.getdoc(cls)
       )
       all_links.append(link_dict)
