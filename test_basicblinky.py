@@ -67,9 +67,6 @@ EXPECTED_KICAD_NETLIST = """\
   (node (ref _t42BdSzQ.package) (pin 1))))
 )"""
 
-EXPECTED_SVGPCB_FUNCTIONS = [
-]
-
 EXPECTED_SVGPCB_INSTANTIATIONS = [
   "const _p5zNfcKi = board.add(Nucleo32, {\ntranslate: pt(0, 0), rotate: 0,\nid: '_p5zNfcKi'\n})",
   "const _t42BdSzQ_package = board.add(LED_0603_1608Metric, {\ntranslate: pt(0, 0), rotate: 0,\nid: '_t42BdSzQ_package'\n})",
@@ -93,5 +90,5 @@ class BasicBlinkyTestCase(unittest.TestCase):
 
       self.assertEqual(response.json['kicadNetlist'], EXPECTED_KICAD_NETLIST)
 
-      self.assertEqual(response.json['svgpcbFunctions'], EXPECTED_SVGPCB_FUNCTIONS)
+      self.assertEqual(response.json['svgpcbFunctions'], [])
       self.assertEqual(response.json['svgpcbInstantiations'], EXPECTED_SVGPCB_INSTANTIATIONS)

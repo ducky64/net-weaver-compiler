@@ -5,6 +5,7 @@ import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
 import edg_core
+import edgir
 
 import svgpcb_compiler
 
@@ -78,13 +79,20 @@ class ResultNet(BaseModel):
   pads: list[list[str]]  # nested list is [block name, pin name]
 
 
+class CompilerError(BaseModel):
+  path: list[str]  # path to link / block / port, not including the constraint (if any)
+  kind: str  # kind of error, eg "uncompiled block", "failed assertion"
+  name: str  # failing constraint name, if any
+  details: str  # longer description, optional (may be empty)
+
+
 class CompilerResult(BaseModel):
   netlist: list[ResultNet] = []
   kicadNetlist: Optional[str] = None
   kicadFootprints: Optional[list[KicadFootprint]] = None
   svgpcbFunctions: Optional[list[str]] = None
   svgpcbInstantiations: Optional[list[str]] = None
-  errors: list[str] = []
+  errors: list[CompilerError] = []
 
 
 def tohdl_netlist(netlist: JsonNetlist) -> str:
@@ -242,10 +250,15 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
   # generate SVGPCB data
   svgpcb_result = svgpcb_compiler.run(compiled, netlist)
 
-  if compiled.error:  # TODO plumb through structured errors instead of relying on strings
-    errors = [compiled.error]
-  else:
-    errors = []
+  errors = []
+  for error in compiled.errors:
+    errors.append(CompilerError(
+      path=edgir.local_path_to_str_list(error.path),
+      kind=error.kind,
+      name=error.name,
+      details=error.details
+    ))
+
   return CompilerResult(
     netlist=nets_obj,
     kicadNetlist=cast(str, kicad_netlist),
