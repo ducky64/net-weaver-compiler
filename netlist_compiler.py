@@ -82,7 +82,7 @@ class ResultNet(BaseModel):
 class CompilerError(BaseModel):
   path: list[str]  # path to link / block / port, not including the constraint (if any)
   kind: str  # kind of error, eg "uncompiled block", "failed assertion"
-  name: str  # failing constraint name, if any
+  name: str = ""  # failing constraint name, if any
   details: str = ""  # longer description, optional (may be empty)
 
 
