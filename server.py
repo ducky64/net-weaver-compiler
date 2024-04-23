@@ -1,8 +1,6 @@
-from typing import Optional, List
-
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from netlist_compiler import JsonNetlist, compile_netlist, CompilerResult, CompilerError, JsonNetlistValidationError
 
