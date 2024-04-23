@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS, cross_origin
 from pydantic import BaseModel, ValidationError
 
-from netlist_compiler import JsonNetlist, compile_netlist, CompilerResult
+from netlist_compiler import JsonNetlist, compile_netlist, CompilerResult, CompilerError, JsonNetlistValidationError
 
 
 app = Flask(__name__)
@@ -20,12 +20,18 @@ def version():
 def compile():
   try:
     json_netlist = JsonNetlist.model_validate_json(request.get_data())
-  except ValidationError as e:
-    return jsonify(CompilerResult(errors=["invalid input format"]).model_dump()), 400
-
-  try:
     result = compile_netlist(json_netlist)
+  except JsonNetlistValidationError as e:
+    return jsonify(CompilerResult(errors=[
+      CompilerError(path=[e.path], kind="invalid input", details=e.desc)
+    ]).model_dump()), 400
+  except ValidationError as e:
+    return jsonify(CompilerResult(errors=[
+      CompilerError(path=[], kind="invalid input", details="format error")
+    ]).model_dump()), 400
   except Exception as e:
-    return jsonify(CompilerResult(errors=[str(e)]).model_dump()), 400
+    return jsonify(CompilerResult(errors=[
+      CompilerError(path=[], kind="unknown internal error")
+    ]).model_dump()), 400
 
   return jsonify(result.model_dump())

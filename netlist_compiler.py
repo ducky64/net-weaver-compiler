@@ -83,7 +83,7 @@ class CompilerError(BaseModel):
   path: list[str]  # path to link / block / port, not including the constraint (if any)
   kind: str  # kind of error, eg "uncompiled block", "failed assertion"
   name: str  # failing constraint name, if any
-  details: str  # longer description, optional (may be empty)
+  details: str = ""  # longer description, optional (may be empty)
 
 
 class CompilerResult(BaseModel):
@@ -93,6 +93,13 @@ class CompilerResult(BaseModel):
   svgpcbFunctions: Optional[list[str]] = None
   svgpcbInstantiations: Optional[list[str]] = None
   errors: list[CompilerError] = []
+
+
+class JsonNetlistValidationError(Exception):
+  def __init__(self, path: list[str], desc: str):
+    super().__init__(f"{'.'.join(path)}: {desc}")
+    self.path = path
+    self.desc = desc
 
 
 def tohdl_netlist(netlist: JsonNetlist) -> str:
@@ -106,25 +113,37 @@ class MyModule(SimpleBoardTop):
   code += "\n"
 
   for node_name, node in netlist.graph.nodes.items():
-    assert node_name.isidentifier(), f"non-identifier block name {node_name}"
+    if not node_name.isidentifier():
+      raise JsonNetlistValidationError([node_name], f"invalid block name")
     block_class = node.data.type
-    assert block_class.isidentifier(), f"non-identifier block class {block_class}"
+    if not node_name.isidentifier():
+      raise JsonNetlistValidationError([node_name], f"invalid block class {block_class}")
 
     args_elts = []
     for arg_param in node.data.argParams:
       if arg_param.default_value != arg_param.value and arg_param.value:
         # parse and sanitize the value
         if arg_param.type == 'int':
-          arg_value = str(int(arg_param.value))
+          try:
+            arg_value = str(int(arg_param.value))
+          except ValueError:
+            raise JsonNetlistValidationError([node_name, arg_param], f"invalid non-int value {arg_param.value}")
         elif arg_param.type == 'float':
-          arg_value = str(float(arg_param.value))
+          try:
+            arg_value = str(float(arg_param.value))
+          except ValueError:
+            raise JsonNetlistValidationError([node_name, arg_param], f"invalid non-float value {arg_param.value}")
         elif arg_param.type == 'range':
-          assert isinstance(arg_param.value, list) and len(arg_param.value) == 2
-          arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
+          if not isinstance(arg_param.value, list) and len(arg_param.value) == 2:
+            raise JsonNetlistValidationError([node_name, arg_param], f"invalid value {arg_param.value}")
+          try:
+            arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
+          except ValueError:
+            raise JsonNetlistValidationError([node_name, arg_param], f"invalid range-int value {arg_param.value}")
         elif arg_param.type == 'string':
-          raise ValueError(f"TODO")
+          raise JsonNetlistValidationError([node_name, arg_param.name], f"TODO: strings unsupported")
         else:
-          raise ValueError(f"unknown arg param type {arg_param.type}")
+          raise JsonNetlistValidationError([node_name, arg_param.name], f"unknown arg-param type {arg_param.type}")
 
         args_elts.append(f"{arg_param.name}={arg_value}")
     code += f"    self.{node_name} = self.Block({block_class}({', '.join(args_elts)}))\n"
@@ -141,6 +160,8 @@ class MyModule(SimpleBoardTop):
     for label in labels:
       port_node = netlist.graph.nodes[label.nodeId]
       port_port = port_node.data.ports[label.portIdx].name
+      if not label.nodeId.isidentifier() and port_port.isidentifier():
+        raise JsonNetlistValidationError([], f"invalid port label {label.nodeId}.{port_port}")
       port_hdls.append(f"self.{label.nodeId}.{port_port}")
 
     code += f"    self.connect({', '.join(port_hdls)})\n"
@@ -152,6 +173,10 @@ class MyModule(SimpleBoardTop):
     dst_node = netlist.graph.nodes[edge.dst.node_id]
     dst_port = dst_node.data.ports[edge.dst.idx]
 
+    if not edge.src.node_id.isidentifier() and src_port.name.isidentifier():
+      raise JsonNetlistValidationError([], f"invalid connect to {edge.src.node_id}.{src_port.name}")
+    if not edge.dst.node_id.isidentifier() and dst_port.name.isidentifier():
+      raise JsonNetlistValidationError([], f"invalid connect to {edge.dst.node_id}.{dst_port.name}")
     src_hdl = f"self.{edge.src.node_id}.{src_port.name}"
     if src_port.array and dst_port.array:
       dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request_vector()"
