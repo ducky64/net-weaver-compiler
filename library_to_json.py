@@ -2,7 +2,7 @@
 from itertools import chain
 from typing import Optional, List, Any, Union, Tuple
 import inspect
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel
 
 # needed to enable EDG as a submodule instead of requiring it to be installed as a system package
 import sys
@@ -28,6 +28,7 @@ class PortJsonDict(BaseModel):
   hint_signal_direction: Optional[str]  # source | sink | bidir | passive | None
   hint_array_direction: Optional[str]  # source | sink | bidir | None (if not is_array)
   required: bool
+  docstring: Optional[str] = ""  # docstring for the port, if any
 
 
 def port_to_dir(name: str, target: edgir.ref_pb2.LibraryPath) -> Optional[str]:
@@ -189,12 +190,16 @@ def port_to_signal_dir(pair: edgir.elem_pb2.NamedPortLike) -> Optional[str]:
     raise ValueError(f"unknown direction {simpleTarget} in {pair.name}")
 
 
-def pb_to_port(container: edgir.BlockLikeTypes, pair: edgir.elem_pb2.NamedPortLike):
+def pb_to_port(instance: edg_core.BaseBlock, container: edgir.BlockLikeTypes, pair: edgir.elem_pb2.NamedPortLike):
   constrs = [constraint_pair.value for constraint_pair in container.constraints]
   required = bool([constr for constr in constrs
                   if constr.HasField('ref') and len(constr.ref.steps) == 2 and constr.ref.steps[0].name == pair.name
                    and constr.ref.steps[1].HasField('reserved_param')
                    and constr.ref.steps[1].reserved_param == edgir.IS_CONNECTED])
+
+  doc = None
+  if hasattr(instance, pair.name) and getattr(instance, pair.name) in instance._port_docs:
+    doc = instance._port_docs[getattr(instance, pair.name)]
 
   if pair.value.HasField('lib_elem'):
     return PortJsonDict(
@@ -204,7 +209,8 @@ def pb_to_port(container: edgir.BlockLikeTypes, pair: edgir.elem_pb2.NamedPortLi
       hint_position=port_to_dir(pair.name, pair.value.lib_elem),
       hint_signal_direction=port_to_signal_dir(pair),
       hint_array_direction=None,
-      required=required
+      required=required,
+      docstring=doc
     )
   elif pair.value.HasField('array'):
     # TODO: array directionality should be a IR construct exposed through the frontend
@@ -222,7 +228,8 @@ def pb_to_port(container: edgir.BlockLikeTypes, pair: edgir.elem_pb2.NamedPortLi
       hint_position=port_to_dir(pair.name, pair.value.array.self_class),
       hint_signal_direction=port_to_signal_dir(pair),
       hint_array_direction=hint_array_direction,
-      required=required
+      required=required,
+      docstring=doc
     )
   else:
     raise ValueError(f"unknown pair value type ${pair.value}")
@@ -233,6 +240,7 @@ class ParamJsonDict(BaseModel):
   name: str
   type: str  # int | float | bool | range | string | array
   default_value: Optional[ParamValueTypes]  # in Python HDL
+  docstring: Optional[str] = ""  # docstring for the port, if any
 
 
 class BlockJsonDict(BaseModel):
@@ -273,11 +281,11 @@ if __name__ == '__main__':
     # from edg import IndicatorLed
     # cls = IndicatorLed
 
-    obj = cls()
+    instance = cls()
     name = cls.__name__
-    if isinstance(obj, edg_core.Block):
+    if isinstance(instance, edg_core.Block):
       print(f"Elaborating block {name}")
-      block_proto = builder.elaborate_toplevel(obj)
+      block_proto = builder.elaborate_toplevel(instance)
 
       # inspect into the args to get ArgParams
       argParams = []
@@ -289,6 +297,7 @@ if __name__ == '__main__':
                           inspect.Parameter.KEYWORD_ONLY]:
           param_pb = edgir.pair_get_opt(block_proto.params, param_name)
           default_value: Optional[ParamValueTypes] = None
+
           if param_pb is not None:
             if param.default is inspect.Parameter.empty:
               default_value = None
@@ -339,22 +348,31 @@ if __name__ == '__main__':
             else:
               raise ValueError(f"{name}.{param_name} unknown param type {param_pb}")
 
+            doc = None
+            if hasattr(instance, param_name) and getattr(instance, param_name) in instance._param_docs:
+              doc = instance._param_docs[getattr(instance, param_name)]
+
             argParams.append(ParamJsonDict(
               name=param_name,
               type=param_type,
-              default_value=default_value
+              default_value=default_value,
+              docstring=doc
             ))
           else:
             print(f"missing param {param_name} in {name}")
+
+      block_docstring = None
+      if cls.__doc__ is not None:
+        block_docstring = inspect.cleandoc(cls.__doc__)
 
       block_dict = BlockJsonDict(
         name="",  # empty for libraries
         type=simpleName(block_proto.self_class),
         superClasses=[simpleName(superclass) for superclass in block_proto.superclasses],
-        ports=[pb_to_port(block_proto, pair) for pair in block_proto.ports],
+        ports=[pb_to_port(instance, block_proto, pair) for pair in block_proto.ports],
         argParams=argParams,
         is_abstract=block_proto.is_abstract,
-        docstring=inspect.getdoc(cls)
+        docstring=block_docstring
       )
       all_blocks.append(block_dict)
 
@@ -362,22 +380,22 @@ if __name__ == '__main__':
         subclasses.setdefault(simpleName(superclass), []).append(simpleName(block_proto.self_class))
       if not block_proto.superclasses:  # no superclasses, add to root
         subclasses.setdefault('', []).append(simpleName(block_proto.self_class))
-    elif isinstance(obj, edg_core.Link):
-      link_proto = builder.elaborate_toplevel(obj)
+    elif isinstance(instance, edg_core.Link):
+      link_proto = builder.elaborate_toplevel(instance)
       pb.root.members[name].link.CopyFrom(link_proto)
 
       link_dict = BlockJsonDict(
         name="",  # empty for libraries
         type=simpleName(link_proto.self_class),
-        ports=[pb_to_port(link_proto, pair) for pair in link_proto.ports],
+        ports=[pb_to_port(instance, link_proto, pair) for pair in link_proto.ports],
         docstring=inspect.getdoc(cls)
       )
       all_links.append(link_dict)
 
-    elif isinstance(obj, edg_core.Bundle):  # TODO: note Bundle extends Port, so this must come first
+    elif isinstance(instance, edg_core.Bundle):  # TODO: note Bundle extends Port, so this must come first
       # pb.root.members[name].bundle.CopyFrom(obj._def_to_proto())
       pass
-    elif isinstance(obj, edg_core.Port):
+    elif isinstance(instance, edg_core.Port):
       # pb.root.members[name].port.CopyFrom(obj._def_to_proto())
       pass
 
