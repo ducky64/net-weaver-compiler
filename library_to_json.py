@@ -90,6 +90,8 @@ def port_to_signal_dir(pair: edgir.elem_pb2.NamedPortLike) -> Optional[str]:
     simpleTarget = simpleName(pair.value.lib_elem)
   elif pair.value.HasField('array'):
     simpleTarget = simpleName(pair.value.array.self_class)
+  else:
+    raise ValueError(f"unknown port type {pair.value}")
 
   if simpleTarget == 'Passive':
     return 'passive'
@@ -275,15 +277,26 @@ if __name__ == '__main__':
   all_links = []
 
   subclasses: dict[str, list[str]] = {}  # superclass -> [subclasses]
+  excluded_classes: list[edg_core.Block] = []  # list of excluded classes
+
+  def is_excluded_class(block: edg_core.Block) -> bool:
+    if isinstance(block, edg_core.BlockInterfaceMixin) and block._is_mixin():
+      return True
+    if isinstance(block, edg.InternalBlock):
+      return True
+    if block.__class__ is edg.BaseIoController:  # manual exclusions
+      return True
+    return False
 
   count = 0
   for cls in library.index_module(edg):
-    # from edg import IndicatorLed
-    # cls = IndicatorLed
-
     instance = cls()
     name = cls.__name__
     if isinstance(instance, edg_core.Block):
+      if is_excluded_class(instance):
+        excluded_classes.append(instance)
+        continue  # skip
+
       print(f"Elaborating block {name}")
       block_proto = builder.elaborate_toplevel(instance)
 
@@ -368,7 +381,8 @@ if __name__ == '__main__':
       block_dict = BlockJsonDict(
         name="",  # empty for libraries
         type=simpleName(block_proto.self_class),
-        superClasses=[simpleName(superclass) for superclass in block_proto.superclasses],
+        superClasses=[simpleName(superclass) for superclass in block_proto.superclasses]
+                     + [simpleName(superclass) for superclass in block_proto.super_superclasses],
         ports=[pb_to_port(instance, block_proto, pair) for pair in block_proto.ports],
         argParams=argParams,
         is_abstract=block_proto.is_abstract,
@@ -401,6 +415,11 @@ if __name__ == '__main__':
 
     count += 1
 
+  excluded_class_simplenames = [simpleName(edgir.libpath(block._get_def_name())) for block in excluded_classes]
+  for block in all_blocks:
+    block.superClasses = [superclass for superclass in block.superClasses
+                          if superclass not in excluded_class_simplenames]
+
   hierarchy_seen: set[str] = set()
 
   def sort_hierarchy_list(in_list: list[TypeHierarchyNode]) -> list[TypeHierarchyNode]:
@@ -415,6 +434,8 @@ if __name__ == '__main__':
       )
     )
 
+  subclasses = {name: subclasses_list for name, subclasses_list in subclasses.items()
+                if name not in excluded_class_simplenames}
   root_hierarchy_elts = sort_hierarchy_list(
     [generate_hierarchy_node(child) for child in subclasses.get('', [])]
   )
