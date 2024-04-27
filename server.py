@@ -11,7 +11,7 @@ CORS(app)
 
 @app.route("/version", methods=['GET'])
 def version():
-  return "0.5"
+  return "0.6"
 
 @app.route("/compile", methods=['POST', 'OPTIONS'])
 @cross_origin(origins=['*'])

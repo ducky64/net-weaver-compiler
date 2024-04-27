@@ -9,20 +9,15 @@ class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 
-    self._QGZd05Ri = self.Block(UsbCReceptacle())
-    self._n3w58oKp = self.Block(Ldl1117(output_voltage=(3.0, 3.6)))
-    self._xQhDBnLi = self.Block(SwitchMatrix(nrows=3, ncols=2))
-    self._UJOuhuHr = self.Block(Rp2040())
+    self._GbcAGW19 = self.Block(SwitchMatrix(nrows=3, ncols=2))
+    self._l21NtIKX = self.Block(Xiao_Rp2040())
 
-    self.connect(self._n3w58oKp.pwr_in, self._QGZd05Ri.pwr)
-    self.connect(self._QGZd05Ri.gnd, self._UJOuhuHr.gnd, self._n3w58oKp.gnd)
-    self.connect(self._n3w58oKp.pwr_out, self._UJOuhuHr.pwr)
-    self.connect(self._xQhDBnLi.cols, self._UJOuhuHr.gpio.request_vector())
-    self.connect(self._xQhDBnLi.rows, self._UJOuhuHr.gpio.request_vector())
+    self.connect(self._GbcAGW19.cols, self._l21NtIKX.gpio.request_vector('gpio_12'))
+    self.connect(self._GbcAGW19.rows, self._l21NtIKX.gpio.request_vector('gpio_13'))
 """
 
 EXPECTED_SVGPCB_FUNCTIONS = ["""\
-function SwitchMatrix__xQhDBnLi_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=[0.25, 0]) {
+function SwitchMatrix__GbcAGW19_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=[0.25, 0]) {
   // Circuit generator params
   const ncols = 2
   const nrows = 3
@@ -51,7 +46,7 @@ function SwitchMatrix__xQhDBnLi_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=
         SW_SPST_SKQG_WithoutStem,
         {
           translate: buttonPos, rotate: 0,
-          id: `_xQhDBnLi_sw[${xIndex}][${yIndex}]`
+          id: `_GbcAGW19_sw[${xIndex}][${yIndex}]`
         })
 
       diodePos = [buttonPos[0] + diodeOffset[0], buttonPos[1] + diodeOffset[1]]
@@ -59,7 +54,7 @@ function SwitchMatrix__xQhDBnLi_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=
         D_SMA,
         {
           translate: diodePos, rotate: 90,
-          id: `_xQhDBnLi_d[${xIndex}][${yIndex}]`
+          id: `_GbcAGW19_d[${xIndex}][${yIndex}]`
         })
 
       // create stub wire for button -> column common line
@@ -97,7 +92,7 @@ function SwitchMatrix__xQhDBnLi_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=
 class KeyboardTestCase(unittest.TestCase):
   def test_compile(self):
     # the server messes with cwd so we need to use the absolute path
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "Keyboard.json")) as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/BasicKeyboard.json")) as f:
       netlist_data = f.read()
       netlist = JsonNetlist.model_validate_json(netlist_data)
 
