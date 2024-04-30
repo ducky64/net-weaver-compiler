@@ -9,15 +9,15 @@ class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 
-    self._GbcAGW19 = self.Block(SwitchMatrix(nrows=3, ncols=2))
-    self._l21NtIKX = self.Block(Xiao_Rp2040())
+    self.SwitchMatrix = self.Block(SwitchMatrix(nrows=3, ncols=2))
+    self.Xiao_Rp2040 = self.Block(Xiao_Rp2040())
 
-    self.connect(self._GbcAGW19.cols, self._l21NtIKX.gpio.request_vector('gpio_12'))
-    self.connect(self._GbcAGW19.rows, self._l21NtIKX.gpio.request_vector('gpio_13'))
+    self.connect(self.SwitchMatrix.cols, self.Xiao_Rp2040.gpio.request_vector('gpio_12'))
+    self.connect(self.SwitchMatrix.rows, self.Xiao_Rp2040.gpio.request_vector('gpio_13'))
 """
 
 EXPECTED_SVGPCB_FUNCTIONS = ["""\
-function SwitchMatrix__GbcAGW19_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=[0.25, 0]) {
+function SwitchMatrix_2_3_SwitchMatrix(xy, colSpacing=1, rowSpacing=1, diodeOffset=[0.25, 0]) {
   // Circuit generator params
   const ncols = 2
   const nrows = 3
@@ -41,12 +41,12 @@ function SwitchMatrix__GbcAGW19_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=
     for (let xIndex=0; xIndex < ncols; xIndex++) {
       index = yIndex * ncols + xIndex + 1
 
-      buttonPos = [colSpacing * xIndex, rowSpacing * yIndex]
+      buttonPos = [xy[0] + colSpacing * xIndex, xy[1] + rowSpacing * yIndex]
       obj.footprints[`sw[${xIndex}][${yIndex}]`] = button = board.add(
         SW_SPST_SKQG_WithoutStem,
         {
           translate: buttonPos, rotate: 0,
-          id: `_GbcAGW19_sw[${xIndex}][${yIndex}]`
+          id: `SwitchMatrix_sw[${xIndex}][${yIndex}]`
         })
 
       diodePos = [buttonPos[0] + diodeOffset[0], buttonPos[1] + diodeOffset[1]]
@@ -54,7 +54,7 @@ function SwitchMatrix__GbcAGW19_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=
         D_SMA,
         {
           translate: diodePos, rotate: 90,
-          id: `_GbcAGW19_d[${xIndex}][${yIndex}]`
+          id: `SwitchMatrix_d[${xIndex}][${yIndex}]`
         })
 
       // create stub wire for button -> column common line
@@ -64,7 +64,7 @@ function SwitchMatrix__GbcAGW19_2_3(xy, colSpacing=1, rowSpacing=1, diodeOffset=
 
       // create wire for button -> diode
       board.wire([button.pad("1"), diode.pad("1")], traceSize, "F.Cu")
-      diodeViaPos = [diode.padX("2"), diode.padY("2") + 0.5]
+      diodeViaPos = [diode.padX("2"), buttonPos[1] + rowSpacing / 2]
       diodeVia = board.add(viaTemplate, {translate: diodeViaPos})
       board.wire([diode.pad("2"), diodeVia.pos], traceSize)
 

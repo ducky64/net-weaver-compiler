@@ -7,8 +7,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
 import edg_core
 import edgir
 
-import svgpcb_compiler
-
 
 class JsonNetPort(BaseModel):
   nodeId: str  # unused, internal node ID
@@ -32,7 +30,7 @@ class JsonNodeArgParam(BaseModel):
   value: Optional[Any]  # value as specified by the user
 
 class JsonNodeData(BaseModel):
-  name: str  # ???
+  name: str  # user-facing name
   type: str  # node class
   superClasses: list[str]  # superclasses, excluding self type
   ports: list[JsonNodePort]
@@ -115,12 +113,12 @@ class MyModule(SimpleBoardTop):
 
   code += "\n"
 
-  for node_name, node in netlist.graph.nodes.items():
-    if not node_name.isidentifier():
-      raise JsonNetlistValidationError([node_name], f"invalid block name")
+  for node_id, node in netlist.graph.nodes.items():
+    if not node.data.name.isidentifier():
+      raise JsonNetlistValidationError([node.data.name], f"invalid block name")
     block_class = node.data.type
-    if not node_name.isidentifier():
-      raise JsonNetlistValidationError([node_name], f"invalid block class {block_class}")
+    if not block_class.isidentifier():
+      raise JsonNetlistValidationError([node.data.name], f"invalid block class {block_class}")
 
     args_elts = []
     for arg_param in node.data.argParams:
@@ -130,26 +128,26 @@ class MyModule(SimpleBoardTop):
           try:
             arg_value = str(int(arg_param.value))
           except ValueError:
-            raise JsonNetlistValidationError([node_name, arg_param], f"invalid non-int value {arg_param.value}")
+            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-int value {arg_param.value}")
         elif arg_param.type == 'float':
           try:
             arg_value = str(float(arg_param.value))
           except ValueError:
-            raise JsonNetlistValidationError([node_name, arg_param], f"invalid non-float value {arg_param.value}")
+            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-float value {arg_param.value}")
         elif arg_param.type == 'range':
           if not isinstance(arg_param.value, list) and len(arg_param.value) == 2:
-            raise JsonNetlistValidationError([node_name, arg_param], f"invalid value {arg_param.value}")
+            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid value {arg_param.value}")
           try:
             arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
           except ValueError:
-            raise JsonNetlistValidationError([node_name, arg_param], f"invalid range-int value {arg_param.value}")
+            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid range-int value {arg_param.value}")
         elif arg_param.type == 'string':
-          raise JsonNetlistValidationError([node_name, arg_param.name], f"TODO: strings unsupported")
+          raise JsonNetlistValidationError([node.data.name, arg_param.name], f"TODO: strings unsupported")
         else:
-          raise JsonNetlistValidationError([node_name, arg_param.name], f"unknown arg-param type {arg_param.type}")
+          raise JsonNetlistValidationError([node.data.name, arg_param.name], f"unknown arg-param type {arg_param.type}")
 
         args_elts.append(f"{arg_param.name}={arg_value}")
-    code += f"    self.{node_name} = self.Block({block_class}({', '.join(args_elts)}))\n"
+    code += f"    self.{node.data.name} = self.Block({block_class}({', '.join(args_elts)}))\n"
   code += "\n"
 
   labels_by_name: dict[str, list[JsonLabel]] = { }
@@ -178,18 +176,18 @@ class MyModule(SimpleBoardTop):
     for label in labels:
       port_node = netlist.graph.nodes[label.nodeId]
       port_port = port_node.data.ports[label.portIdx]
-      if not label.nodeId.isidentifier() and port_port.name.isidentifier():
-        raise JsonNetlistValidationError([], f"invalid port label {label.nodeId}.{port_port.name}")
+      if not port_port.name.isidentifier():
+        raise JsonNetlistValidationError([], f"invalid port label {port_node.data.name}.{port_port.name}")
       if port_port.elementOf is not None:  # array request
         port_parent_port = port_node.data.ports[port_port.elementOf].name
-        if not label.nodeId.isidentifier() and port_parent_port.isidentifier():
-          raise JsonNetlistValidationError([], f"invalid port label {label.nodeId}.{port_parent_port}")
+        if not port_parent_port.isidentifier():
+          raise JsonNetlistValidationError([], f"invalid port label {port_node.data.name}.{port_parent_port}")
         if is_array:
-          port_hdls.append(f"self.{label.nodeId}.{port_parent_port}.request_vector('{port_port.name}')")
+          port_hdls.append(f"self.{port_node.data.name}.{port_parent_port}.request_vector('{port_port.name}')")
         else:
-          port_hdls.append(f"self.{label.nodeId}.{port_parent_port}.request('{port_port.name}')")
+          port_hdls.append(f"self.{port_node.data.name}.{port_parent_port}.request('{port_port.name}')")
       else:  # single port
-        port_hdls.append(f"self.{label.nodeId}.{port_port.name}")
+        port_hdls.append(f"self.{port_node.data.name}.{port_port.name}")
 
     code += f"    self.connect({', '.join(port_hdls)})\n"
 
@@ -253,7 +251,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
 
   from electronics_model.NetlistGenerator import NetlistTransform
   from electronics_model.footprint import generate_netlist
-  from edg import SvgPcbTemplateBlock
+  from edg import SvgPcbTemplateBlock, SvgPcbBackend
 
   netlist = NetlistTransform(compiled).run()
   kicad_netlist = generate_netlist(netlist, True)
@@ -301,7 +299,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
       print(f"failed to resolve footprint {footprint}")
 
   # generate SVGPCB data
-  svgpcb_result = svgpcb_compiler.run(compiled, netlist)
+  svgpcb_result = SvgPcbBackend()._generate(compiled, netlist)
 
   errors = []
   for error in compiled.errors:

@@ -9,13 +9,13 @@ class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 
-    self._Uxz6bvy1 = self.Block(Xiao_Rp2040())
-    self._wtBTgiHw = self.Block(Hdc1080())
-    self._Z6CrKBnO = self.Block(I2cPullup())
+    self.Xiao_Rp2040 = self.Block(Xiao_Rp2040())
+    self.Hdc1080 = self.Block(Hdc1080())
+    self.I2cPullup = self.Block(I2cPullup())
 
-    self.connect(self._Z6CrKBnO.i2c, self._wtBTgiHw.i2c, self._Uxz6bvy1.i2c.request('i2c_12'))
-    self.connect(self._wtBTgiHw.gnd, self._Uxz6bvy1.gnd_out)
-    self.connect(self._wtBTgiHw.vdd, self._Uxz6bvy1.pwr_out, self._Z6CrKBnO.pwr)
+    self.connect(self.I2cPullup.i2c, self.Hdc1080.i2c, self.Xiao_Rp2040.i2c.request('i2c_12'))
+    self.connect(self.Hdc1080.gnd, self.Xiao_Rp2040.gnd_out)
+    self.connect(self.Hdc1080.vdd, self.Xiao_Rp2040.pwr_out, self.I2cPullup.pwr)
 """
 
 

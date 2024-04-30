@@ -18,5 +18,5 @@ class BasicBlinkyTestCase(unittest.TestCase):
 
       self.assertEqual(response.status_code, 200)
       all_error_paths = [error['path'] for error in response.json['errors']]  # order-independent
-      self.assertIn(['_uIfOdj51', '_pwr_link'], all_error_paths)
-      self.assertIn(['__nKT51Gkb_pwr_link'], all_error_paths)
+      self.assertIn(['Stm32f103_48', '_pwr_link'], all_error_paths)
+      self.assertIn(['_UsbCReceptacle_pwr_link'], all_error_paths)
