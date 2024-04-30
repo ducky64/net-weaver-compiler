@@ -257,10 +257,10 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
   kicad_netlist = generate_netlist(netlist, True)
 
   # generate structured netlist
-  netlist_block_dict = {block.full_path: block for block in netlist.blocks}
   nets_obj = [ResultNet(
     name=net.name,
-    pads=[['_'.join(netlist_block_dict[pin.block_path].path), pin.pin_name] for pin in net.pins])
+    pads=[[SvgPcbTemplateBlock._svgpcb_pathname_to_svgpcb(pin.block_path), pin.pin_name]
+          for pin in net.pins])
     for net in netlist.nets]
 
   # fetch KiCad data
