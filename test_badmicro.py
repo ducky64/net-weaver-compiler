@@ -6,7 +6,7 @@ from server import app
 app.testing = True
 
 
-class BasicBlinkyTestCase(unittest.TestCase):
+class BadMicroTestCase(unittest.TestCase):
   def test_compile(self):
     # the server messes with cwd so we need to use the absolute path
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/BadMicro.json")) as f:

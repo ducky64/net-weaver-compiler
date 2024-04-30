@@ -10,14 +10,16 @@ class MyModule(SimpleBoardTop):
     super().__init__()
 
     self.Xiao_Esp32c3 = self.Block(Xiao_Esp32c3())
+    self.CharlieplexedLedMatrix = self.Block(CharlieplexedLedMatrix(nrows=2, ncols=3))
 
+    self.connect(self.CharlieplexedLedMatrix.ios, self.Xiao_Esp32c3.gpio.request_vector('gpio_14'))
 """
 
 
-class SinglePartTestCase(unittest.TestCase):
+class CharlieMatrixTestCase(unittest.TestCase):
   def test_compile(self):
     # the server messes with cwd so we need to use the absolute path
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/BrokenSinglePart.json")) as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/CharlieMatrix.json")) as f:
       netlist_data = f.read()
       netlist = JsonNetlist.model_validate_json(netlist_data)
 

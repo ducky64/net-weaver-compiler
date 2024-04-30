@@ -89,7 +89,7 @@ function SwitchMatrix_2_3_SwitchMatrix(xy, colSpacing=1, rowSpacing=1, diodeOffs
 """]
 
 
-class KeyboardTestCase(unittest.TestCase):
+class BasicKeyboardTestCase(unittest.TestCase):
   def test_compile(self):
     # the server messes with cwd so we need to use the absolute path
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/BasicKeyboard.json")) as f:
