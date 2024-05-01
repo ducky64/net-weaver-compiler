@@ -6,6 +6,18 @@ from server import app
 app.testing = True
 
 
+EXPECTED_HDL = """\
+class MyModule(SimpleBoardTop):
+  def __init__(self):
+    super().__init__()
+
+    self.Xiao_Esp32c3 = self.Block(Xiao_Esp32c3())
+    self.IndicatorLed = self.Block(IndicatorLed())
+
+    self.connect(self.IndicatorLed.signal, self.Xiao_Esp32c3.gpio.request('gpio_14'))
+    self.connect(self.IndicatorLed.gnd, self.Xiao_Esp32c3.gnd_out)
+"""
+
 EXPECTED_NETLIST = [
   {'name': 'IndicatorLed.signal', 'pads': [['Xiao_Esp32c3', '2'], ['IndicatorLed_package', '2']]},
   {'name': 'IndicatorLed.gnd', 'pads': [['Xiao_Esp32c3', '13'], ['IndicatorLed_res', '2']]},
@@ -86,6 +98,7 @@ class BasicBlinkyTestCase(unittest.TestCase):
       response = client.post('/compile', data=netlist_data)
 
       self.assertEqual(response.status_code, 200)
+      self.assertEqual(response.json['edgHdl'], EXPECTED_HDL)
       self.assertEqual(response.json['errors'], [])
       self.assertEqual(response.json['netlist'], EXPECTED_NETLIST)
 

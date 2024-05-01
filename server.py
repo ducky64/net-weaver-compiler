@@ -29,7 +29,7 @@ def compile():
     ]).model_dump()), 400
   except Exception as e:
     return jsonify(CompilerResult(errors=[
-      CompilerError(path=[], kind="unknown internal error")
+      CompilerError(path=[], kind=f"internal error", details=repr(e))
     ]).model_dump()), 400
 
   return jsonify(result.model_dump())

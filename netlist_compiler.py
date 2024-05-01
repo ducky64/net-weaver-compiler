@@ -88,6 +88,7 @@ class CompilerError(BaseModel):
 
 
 class CompilerResult(BaseModel):
+  edgHdl: str
   netlist: list[ResultNet] = []
   kicadNetlist: Optional[str] = None
   kicadFootprints: Optional[list[KicadFootprint]] = None
@@ -233,8 +234,9 @@ os.chdir(edg_dir)
 from edg import *
 
 """
-        
-  code += tohdl_netlist(netweave_netlist)
+
+  hdl = tohdl_netlist(netweave_netlist)
+  code += hdl
 
   code += """
 
@@ -311,6 +313,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
     ))
 
   return CompilerResult(
+    edgHdl=hdl,
     netlist=nets_obj,
     kicadNetlist=cast(str, kicad_netlist),
     kicadFootprints=all_footprints,
