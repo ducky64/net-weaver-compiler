@@ -42,19 +42,19 @@ function SwitchMatrix_2_3_SwitchMatrix(xy, colSpacing=1, rowSpacing=1, diodeOffs
       index = yIndex * ncols + xIndex + 1
 
       buttonPos = [xy[0] + colSpacing * xIndex, xy[1] + rowSpacing * yIndex]
-      obj.footprints[`sw[${xIndex}][${yIndex}]`] = button = board.add(
+      obj.footprints[`sw[${xIndex},${yIndex}]`] = button = board.add(
         SW_SPST_SKQG_WithoutStem,
         {
           translate: buttonPos, rotate: 0,
-          id: `SwitchMatrix_sw[${xIndex}][${yIndex}]`
+          id: `SwitchMatrix_sw_${xIndex}_${yIndex}_`
         })
 
       diodePos = [buttonPos[0] + diodeOffset[0], buttonPos[1] + diodeOffset[1]]
-      obj[`d[${xIndex}][${yIndex}]`] = diode = board.add(
+      obj[`d[${xIndex},${yIndex}]`] = diode = board.add(
         D_SMA,
         {
           translate: diodePos, rotate: 90,
-          id: `SwitchMatrix_d[${xIndex}][${yIndex}]`
+          id: `SwitchMatrix_d_${xIndex}_${yIndex}_`
         })
 
       // create stub wire for button -> column common line

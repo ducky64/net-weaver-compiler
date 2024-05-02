@@ -39,7 +39,7 @@
         "nodeId": "_wtBTgiHw",
         "portIdx": 0,
         "name": "_wtBTgiHw",
-        "portName": "vdd"
+        "portName": "pwr"
       },
       {
         "nodeId": "_Uxz6bvy1",
@@ -213,7 +213,7 @@
           ],
           "ports": [
             {
-              "name": "vdd",
+              "name": "pwr",
               "leftRightUpDown": "left",
               "type": "VoltageSink",
               "array": false,
@@ -328,17 +328,17 @@
       "portIdx": 9
     },
     "ybmv94Ay": {
-      "labelName": "vdd",
+      "labelName": "pwr",
       "nodeId": "_wtBTgiHw",
       "portIdx": 0
     },
     "meRK45Es": {
-      "labelName": "vdd",
+      "labelName": "pwr",
       "nodeId": "_Uxz6bvy1",
       "portIdx": 10
     },
     "sqicfkyW": {
-      "labelName": "vdd",
+      "labelName": "pwr",
       "nodeId": "_Z6CrKBnO",
       "portIdx": 0
     }

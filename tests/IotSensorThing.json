@@ -101,13 +101,13 @@
         "nodeId": "_Son1wfSx",
         "portIdx": 0,
         "name": "_Son1wfSx",
-        "portName": "vdd"
+        "portName": "pwr"
       },
       {
         "nodeId": "_HByp5m9J",
         "portIdx": 0,
         "name": "_HByp5m9J",
-        "portName": "vdd"
+        "portName": "pwr"
       },
       {
         "nodeId": "_LgO1uAPj",
@@ -120,12 +120,6 @@
         "portIdx": 1,
         "name": "_qO3jWOyD",
         "portName": "pwr_out"
-      },
-      {
-        "nodeId": "_HByp5m9J",
-        "portIdx": 1,
-        "name": "_HByp5m9J",
-        "portName": "vddio"
       }
     ]
   ],
@@ -471,7 +465,7 @@
           ],
           "ports": [
             {
-              "name": "vdd",
+              "name": "pwr",
               "leftRightUpDown": "left",
               "type": "VoltageSink",
               "array": false,
@@ -552,7 +546,7 @@
           ],
           "ports": [
             {
-              "name": "vdd",
+              "name": "pwr",
               "leftRightUpDown": "left",
               "type": "VoltageSink",
               "array": false,
@@ -561,7 +555,7 @@
               "idx": 0
             },
             {
-              "name": "vddio",
+              "name": "pwr_io",
               "leftRightUpDown": "left",
               "type": "VoltageSink",
               "array": false,
@@ -771,11 +765,6 @@
     "6KTp6FP8": {
       "labelName": "pwr_out",
       "nodeId": "_qO3jWOyD",
-      "portIdx": 1
-    },
-    "xDWdjiF2": {
-      "labelName": "pwr_out",
-      "nodeId": "_HByp5m9J",
       "portIdx": 1
     }
   }
