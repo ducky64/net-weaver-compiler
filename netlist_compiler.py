@@ -1,11 +1,8 @@
 from typing import Any, cast, Optional
 from pydantic import BaseModel
 
-import sys
 import os.path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
-import edg_core
-import edgir
+from PolymorphicBlocks.edg import core, edgir
 
 
 class JsonNetPort(BaseModel):
@@ -228,10 +225,7 @@ def compile_netlist(netweave_netlist: JsonNetlist) -> CompilerResult:
   """Compiles the JsonNetlist to a KiCad netlist, returning the KiCad netlist along with a list of model
   validation errors (if any)."""
   code = f"""\
-import os
-os.chdir(edg_dir)
-
-from edg import *
+from PolymorphicBlocks.edg import *
 
 """
 
@@ -244,16 +238,14 @@ compiled = ScalaCompiler.compile(MyModule, ignore_errors=True)
 compiled.append_values(RefdesRefinementPass().run(compiled))
 """
 
-  exec_env = {
-    'edg_dir': os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks')
-  }
+  exec_env = {}
   exec(code, exec_env)
 
-  compiled = cast(edg_core.ScalaCompilerInterface.CompiledDesign, exec_env['compiled'])
+  compiled = cast(core.ScalaCompilerInterface.CompiledDesign, exec_env['compiled'])
 
-  from electronics_model.NetlistGenerator import NetlistTransform
-  from electronics_model.footprint import generate_netlist
-  from edg import SvgPcbTemplateBlock, SvgPcbBackend
+  from PolymorphicBlocks.edg.electronics_model.NetlistGenerator import NetlistTransform
+  from PolymorphicBlocks.edg.electronics_model.footprint import generate_netlist
+  from PolymorphicBlocks.edg import SvgPcbTemplateBlock, SvgPcbBackend
 
   netlist = NetlistTransform(compiled).run()
   kicad_netlist = generate_netlist(netlist, True)
