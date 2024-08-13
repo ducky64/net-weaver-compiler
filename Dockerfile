@@ -15,7 +15,6 @@ COPY footprints/ ./footprints/
 COPY PolymorphicBlocks/ ./PolymorphicBlocks/
 
 COPY server.py netlist_compiler.py svgpcb_compiler.py ./
-ENV FLASK_APP=server.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 EXPOSE 80
