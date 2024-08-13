@@ -261,7 +261,7 @@ class LibraryJson(BaseModel):
   typeHierarchyTree: TypeHierarchyNode
 
 
-OUTPUT_FILE = "library.json"
+OUTPUT_FILE = "resources/library.json"
 
 if __name__ == '__main__':
   library = LibraryElementIndexer()

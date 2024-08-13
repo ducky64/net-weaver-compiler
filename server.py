@@ -42,3 +42,9 @@ def compile():
     ).model_dump()), 400
 
   return jsonify(result.model_dump())
+
+@app.route("/library", methods=['GET'])
+@cross_origin(origins=['*'])
+def library():
+  with open("resources/library.json") as f:
+    return f.read()
