@@ -2,7 +2,7 @@ import unittest
 import os.path
 
 from netlist_compiler import JsonNetlist
-from server import app
+from app import app
 app.testing = True
 
 

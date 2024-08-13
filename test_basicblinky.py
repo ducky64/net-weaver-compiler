@@ -2,7 +2,7 @@ import unittest
 import os.path
 
 from netlist_compiler import JsonNetlist
-from server import app
+from app import app
 app.testing = True
 
 
@@ -15,7 +15,7 @@ class MyModule(SimpleBoardTop):
     self.IndicatorLed = self.Block(IndicatorLed())
 
     self.connect(self.IndicatorLed.signal, self.Xiao_Esp32c3.gpio.request('gpio_14'))
-    self.connect(self.IndicatorLed.gnd, self.Xiao_Esp32c3.gnd_out)
+    self.connect(self.IndicatorLed.gnd, self.Xiao_Esp32c3.gnd)
 """
 
 EXPECTED_NETLIST = [

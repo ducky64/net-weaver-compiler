@@ -14,7 +14,7 @@ class MyModule(SimpleBoardTop):
     self.I2cPullup = self.Block(I2cPullup())
 
     self.connect(self.I2cPullup.i2c, self.Hdc1080.i2c, self.Xiao_Rp2040.i2c.request('i2c_12'))
-    self.connect(self.Hdc1080.gnd, self.Xiao_Rp2040.gnd_out)
+    self.connect(self.Hdc1080.gnd, self.Xiao_Rp2040.gnd)
     self.connect(self.Hdc1080.pwr, self.Xiao_Rp2040.pwr_out, self.I2cPullup.pwr)
 """
 

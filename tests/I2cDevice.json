@@ -15,7 +15,7 @@
       },
       {
         "nodeId": "_Uxz6bvy1",
-        "portIdx": 12,
+        "portIdx": 11,
         "name": "_Uxz6bvy1",
         "portName": "i2c_12"
       }
@@ -29,9 +29,9 @@
       },
       {
         "nodeId": "_Uxz6bvy1",
-        "portIdx": 9,
+        "portIdx": 7,
         "name": "_Uxz6bvy1",
-        "portName": "gnd_out"
+        "portName": "gnd"
       }
     ],
     [
@@ -43,7 +43,7 @@
       },
       {
         "nodeId": "_Uxz6bvy1",
-        "portIdx": 10,
+        "portIdx": 9,
         "name": "_Uxz6bvy1",
         "portName": "pwr_out"
       },
@@ -148,7 +148,7 @@
               "idx": 8
             },
             {
-              "name": "gnd_out",
+              "name": "pwr_out",
               "leftRightUpDown": "right",
               "type": "VoltageSource",
               "array": false,
@@ -157,7 +157,7 @@
               "idx": 9
             },
             {
-              "name": "pwr_out",
+              "name": "vusb_out",
               "leftRightUpDown": "right",
               "type": "VoltageSource",
               "array": false,
@@ -166,18 +166,9 @@
               "idx": 10
             },
             {
-              "name": "vusb_out",
-              "leftRightUpDown": "right",
-              "type": "VoltageSource",
-              "array": false,
-              "srcSinkBi": null,
-              "required": false,
-              "idx": 11
-            },
-            {
               "name": "i2c_12",
               "array": false,
-              "idx": 12,
+              "idx": 11,
               "leftRightUpDown": "right",
               "srcSinkBi": "bi",
               "type": "DigitalBidir",
@@ -187,7 +178,6 @@
           "argParams": []
         },
         "ports": [
-          [],
           [],
           [],
           [],
@@ -315,7 +305,7 @@
     "iFjQGHS7": {
       "labelName": "i2c",
       "nodeId": "_Uxz6bvy1",
-      "portIdx": 12
+      "portIdx": 11
     },
     "DLMjMMkt": {
       "labelName": "gnd",
@@ -325,7 +315,7 @@
     "4Zp0J2Y2": {
       "labelName": "gnd",
       "nodeId": "_Uxz6bvy1",
-      "portIdx": 9
+      "portIdx": 7
     },
     "ybmv94Ay": {
       "labelName": "pwr",
@@ -335,7 +325,7 @@
     "meRK45Es": {
       "labelName": "pwr",
       "nodeId": "_Uxz6bvy1",
-      "portIdx": 10
+      "portIdx": 9
     },
     "sqicfkyW": {
       "labelName": "pwr",

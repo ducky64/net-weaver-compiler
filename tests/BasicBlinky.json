@@ -9,7 +9,7 @@
       },
       {
         "nodeId": "_L45VcfTC",
-        "portIdx": 14,
+        "portIdx": 13,
         "name": "_L45VcfTC",
         "portName": "gpio_14"
       }
@@ -129,7 +129,7 @@
               "idx": 10
             },
             {
-              "name": "gnd_out",
+              "name": "pwr_out",
               "leftRightUpDown": "right",
               "type": "VoltageSource",
               "array": false,
@@ -137,7 +137,7 @@
               "idx": 11
             },
             {
-              "name": "pwr_out",
+              "name": "vusb_out",
               "leftRightUpDown": "right",
               "type": "VoltageSource",
               "array": false,
@@ -145,17 +145,9 @@
               "idx": 12
             },
             {
-              "name": "vusb_out",
-              "leftRightUpDown": "right",
-              "type": "VoltageSource",
-              "array": false,
-              "srcSinkBi": null,
-              "idx": 13
-            },
-            {
               "name": "gpio_14",
               "array": false,
-              "idx": 14,
+              "idx": 13,
               "leftRightUpDown": "left",
               "srcSinkBi": "bi",
               "type": "DigitalBidir",
@@ -165,7 +157,6 @@
           "argParams": []
         },
         "ports": [
-          [],
           [],
           [],
           [],
@@ -260,7 +251,7 @@
     "UnXZ9r2O": {
       "labelName": "signal",
       "nodeId": "_L45VcfTC",
-      "portIdx": 14
+      "portIdx": 13
     },
     "6D5dLTIr": {
       "labelName": "gnd",
@@ -270,7 +261,7 @@
     "1VCsNMlV": {
       "labelName": "gnd",
       "nodeId": "_L45VcfTC",
-      "portIdx": 11
+      "portIdx": 7
     }
   }
 }
