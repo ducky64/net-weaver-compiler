@@ -12,9 +12,10 @@ RUN pip install -r requirements.txt
 
 COPY footprints/ ./footprints/
 
+COPY resources/ ./resources/
 COPY PolymorphicBlocks/ ./PolymorphicBlocks/
 
-COPY server.py netlist_compiler.py svgpcb_compiler.py ./
+COPY app.py netlist_compiler.py svgpcb_compiler.py ./
 ENV FLASK_RUN_HOST=0.0.0.0
 
 EXPOSE 80
