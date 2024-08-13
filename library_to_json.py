@@ -4,16 +4,11 @@ from typing import Optional, List, Any, Union, Tuple
 import inspect
 from pydantic import BaseModel
 
-# needed to enable EDG as a submodule instead of requiring it to be installed as a system package
-import sys
-import os.path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'PolymorphicBlocks'))
-
-from edg_hdl_server.__main__ import LibraryElementIndexer
-import edg_core
-import edgir
-import edg
-from edg_core.Builder import builder
+from PolymorphicBlocks import edg
+from PolymorphicBlocks.edg import *
+from PolymorphicBlocks.edg import core, edgir
+from PolymorphicBlocks.edg.hdl_server.__main__ import LibraryElementIndexer
+from PolymorphicBlocks.edg.core.Builder import builder
 
 
 def simpleName(target: edgir.ref_pb2.LibraryPath) -> str:
@@ -192,7 +187,7 @@ def port_to_signal_dir(pair: edgir.elem_pb2.NamedPortLike) -> Optional[str]:
     raise ValueError(f"unknown direction {simpleTarget} in {pair.name}")
 
 
-def pb_to_port(instance: edg_core.BaseBlock, container: edgir.BlockLikeTypes, pair: edgir.elem_pb2.NamedPortLike):
+def pb_to_port(instance: core.BaseBlock, container: edgir.BlockLikeTypes, pair: edgir.elem_pb2.NamedPortLike):
   constrs = [constraint_pair.value for constraint_pair in container.constraints]
   required = bool([constr for constr in constrs
                   if constr.HasField('ref') and len(constr.ref.steps) == 2 and constr.ref.steps[0].name == pair.name
@@ -277,14 +272,14 @@ if __name__ == '__main__':
   all_links = []
 
   subclasses: dict[str, list[str]] = {}  # superclass -> [subclasses]
-  excluded_classes: list[edg_core.Block] = []  # list of excluded classes
+  excluded_classes: list[Block] = []  # list of excluded classes
 
-  def is_excluded_class(block: edg_core.Block) -> bool:
-    if isinstance(block, edg_core.BlockInterfaceMixin) and block._is_mixin():
+  def is_excluded_class(block: Block) -> bool:
+    if isinstance(block, BlockInterfaceMixin) and block._is_mixin():
       return True
-    if isinstance(block, edg.InternalBlock):
+    if isinstance(block, InternalBlock):
       return True
-    if block.__class__ is edg.BaseIoController:  # manual exclusions
+    if block.__class__ is BaseIoController:  # manual exclusions
       return True
     return False
 
@@ -292,7 +287,7 @@ if __name__ == '__main__':
   for cls in library.index_module(edg):
     instance = cls()
     name = cls.__name__
-    if isinstance(instance, edg_core.Block):
+    if isinstance(instance, Block):
       if is_excluded_class(instance):
         excluded_classes.append(instance)
         continue  # skip
@@ -319,27 +314,27 @@ if __name__ == '__main__':
             elif isinstance(param.default, tuple) and len(param.default) == 2 and \
                 isinstance(param.default[0], (int, float)) and isinstance(param.default[1], (int, float)):
               default_value = str(param.default)
-            elif isinstance(param.default, edg_core.Range):
+            elif isinstance(param.default, Range):
               range = param.default
               default_value = (range.lower, range.upper)
-            elif isinstance(param.default, edg_core.RangeExpr):
-              if isinstance(param.default.binding, edg_core.ConstraintExpr.RangeLiteralBinding):
+            elif isinstance(param.default, RangeExpr):
+              if isinstance(param.default.binding, core.Binding.RangeLiteralBinding):
                 range = param.default.binding.value
                 default_value = (range.lower, range.upper)
               else:
                 print(f"{name}.{param_name}: bad binding {param.default.binding}")
-            elif isinstance(param.default, edg_core.FloatExpr):
-              if isinstance(param.default.binding, edg_core.ConstraintExpr.FloatLiteralBinding):
+            elif isinstance(param.default, FloatExpr):
+              if isinstance(param.default.binding, core.Binding.FloatLiteralBinding):
                 default_value = param.default.binding.value
               else:
                 print(f"{name}.{param_name}: bad binding {param.default.binding}")
-            elif isinstance(param.default, edg_core.BoolExpr):
-              if isinstance(param.default.binding, edg_core.ConstraintExpr.BoolLiteralBinding):
+            elif isinstance(param.default, BoolExpr):
+              if isinstance(param.default.binding, core.Binding.BoolLiteralBinding):
                 default_value = param.default.binding.value
               else:
                 print(f"{name}.{param_name}: bad binding {param.default.binding}")
-            elif isinstance(param.default, edg_core.StringExpr):
-              if isinstance(param.default.binding, edg_core.ConstraintExpr.StringLiteralBinding):
+            elif isinstance(param.default, StringExpr):
+              if isinstance(param.default.binding, core.Binding.StringLiteralBinding):
                 default_value = param.default.binding.value
               else:
                 print(f"{name}.{param_name}: bad binding {param.default.binding}")
@@ -394,7 +389,7 @@ if __name__ == '__main__':
         subclasses.setdefault(simpleName(superclass), []).append(simpleName(block_proto.self_class))
       if not block_proto.superclasses:  # no superclasses, add to root
         subclasses.setdefault('', []).append(simpleName(block_proto.self_class))
-    elif isinstance(instance, edg_core.Link):
+    elif isinstance(instance, Link):
       link_proto = builder.elaborate_toplevel(instance)
       pb.root.members[name].link.CopyFrom(link_proto)
 
@@ -406,10 +401,10 @@ if __name__ == '__main__':
       )
       all_links.append(link_dict)
 
-    elif isinstance(instance, edg_core.Bundle):  # TODO: note Bundle extends Port, so this must come first
+    elif isinstance(instance, Bundle):  # TODO: note Bundle extends Port, so this must come first
       # pb.root.members[name].bundle.CopyFrom(obj._def_to_proto())
       pass
-    elif isinstance(instance, edg_core.Port):
+    elif isinstance(instance, Port):
       # pb.root.members[name].port.CopyFrom(obj._def_to_proto())
       pass
 
