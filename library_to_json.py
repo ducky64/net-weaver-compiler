@@ -90,6 +90,10 @@ def port_to_signal_dir(pair: edgir.elem_pb2.NamedPortLike) -> Optional[str]:
 
   if simpleTarget == 'Passive':
     return 'passive'
+  elif simpleTarget == 'Ground':
+    return 'bidir'
+  elif simpleTarget == 'GroundReference':
+    return 'source'
 
   elif simpleTarget == 'VoltageSource':
     return 'source'
