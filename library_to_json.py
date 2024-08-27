@@ -281,7 +281,7 @@ if __name__ == '__main__':
   def is_excluded_class(block: Block) -> bool:
     if isinstance(block, BlockInterfaceMixin) and block._is_mixin():
       return True
-    if isinstance(block, InternalBlock):
+    if isinstance(block, InternalBlock) and not isinstance(block, PassiveConnector):
       return True
     if block.__class__ is BaseIoController:  # manual exclusions
       return True
