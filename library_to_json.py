@@ -442,8 +442,8 @@ if __name__ == '__main__':
   print(f"Missing from type hierarchy: {unseen}")
 
   library_json = LibraryJson(
-    blocks=all_blocks,
-    links=all_links,
+    blocks=sorted(all_blocks, key=lambda block: block.type),
+    links=sorted(all_links, key=lambda link: link.type),
     typeHierarchyTree=TypeHierarchyNode(name='', children=root_hierarchy_elts)
   )
 
