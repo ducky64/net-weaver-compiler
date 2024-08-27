@@ -217,7 +217,9 @@ def pb_to_port(instance: core.BaseBlock, container: edgir.BlockLikeTypes, pair: 
     # TODO: array directionality should be a IR construct exposed through the frontend
     # this is a temporary hack to make things work
     all_superclasses = list(chain(container.superclasses, container.super_superclasses, [container.self_class]))
-    if any(['IoController' in superclass.target.name for superclass in all_superclasses]):
+    # note superclass.target.name contains namespaces so test needs to be generic
+    if any([('IoController' in superclass.target.name or 'PassiveConnector' in superclass.target.name)
+            for superclass in all_superclasses]):
       hint_array_direction = 'sink'
     else:
       hint_array_direction = 'source'

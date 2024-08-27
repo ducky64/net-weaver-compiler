@@ -318,7 +318,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -350,7 +350,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7512,7 +7512,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7570,7 +7570,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7600,7 +7600,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7630,7 +7630,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7661,7 +7661,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7690,7 +7690,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7720,7 +7720,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7751,7 +7751,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -7781,7 +7781,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -8721,7 +8721,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -8754,7 +8754,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -10509,7 +10509,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -10539,7 +10539,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -10569,7 +10569,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -10600,7 +10600,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -10630,7 +10630,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -13235,7 +13235,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -15158,7 +15158,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -15575,7 +15575,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -15604,7 +15604,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -15634,7 +15634,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -15665,7 +15665,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -15696,7 +15696,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -15726,7 +15726,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -19329,7 +19329,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -19360,7 +19360,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -19391,7 +19391,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
@@ -19423,7 +19423,7 @@
           "is_array": true,
           "hint_position": null,
           "hint_signal_direction": "passive",
-          "hint_array_direction": "source",
+          "hint_array_direction": "sink",
           "required": false,
           "docstring": null
         }
