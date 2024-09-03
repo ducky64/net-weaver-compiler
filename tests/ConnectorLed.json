@@ -1,0 +1,178 @@
+{
+  "nets": [
+    [
+      {
+        "nodeId": "_8fUYAYmb",
+        "portIdx": 0,
+        "name": "_8fUYAYmb",
+        "portName": "signal"
+      },
+      {
+        "nodeId": "_kxdXKNKJ",
+        "portIdx": 0,
+        "name": "_kxdXKNKJ",
+        "portName": "port_0"
+      }
+    ],
+    [
+      {
+        "nodeId": "_8fUYAYmb",
+        "portIdx": 1,
+        "name": "_8fUYAYmb",
+        "portName": "gnd"
+      },
+      {
+        "nodeId": "_kxdXKNKJ",
+        "portIdx": 1,
+        "name": "_kxdXKNKJ",
+        "portName": "port_1"
+      }
+    ]
+  ],
+  "graph": {
+    "nodes": {
+      "_kxdXKNKJ": {
+        "data": {
+          "name": "PinHeader254Vertical",
+          "type": "PinHeader254Vertical",
+          "superClasses": [
+            "PinHeader254",
+            "FootprintPassiveConnector",
+            "PassiveConnector"
+          ],
+          "ports": [
+            {
+              "array": false,
+              "idx": 0,
+              "leftRightUpDown": "left",
+              "name": "port_0",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            },
+            {
+              "array": false,
+              "idx": 1,
+              "leftRightUpDown": "left",
+              "name": "port_1",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            },
+            {
+              "array": false,
+              "idx": 2,
+              "leftRightUpDown": "left",
+              "name": "port_2",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            }
+          ],
+          "argParams": [
+            {
+              "name": "length",
+              "type": "int",
+              "default_value": 0,
+              "docstring": null,
+              "value": 3
+            }
+          ]
+        },
+        "ports": [
+          [],
+          [],
+          []
+        ],
+        "id": "_kxdXKNKJ"
+      },
+      "_8fUYAYmb": {
+        "data": {
+          "name": "IndicatorLed",
+          "type": "IndicatorLed",
+          "superClasses": [
+            "Light",
+            "HumanInterface"
+          ],
+          "ports": [
+            {
+              "name": "signal",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 0
+            },
+            {
+              "name": "gnd",
+              "leftRightUpDown": "left",
+              "type": "Ground",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 1
+            }
+          ],
+          "argParams": [
+            {
+              "name": "color",
+              "type": "str",
+              "default_value": "",
+              "docstring": null,
+              "value": ""
+            },
+            {
+              "name": "current_draw",
+              "type": "range",
+              "default_value": [
+                0.001,
+                0.01
+              ],
+              "docstring": null,
+              "value": [
+                0.001,
+                0.01
+              ]
+            }
+          ]
+        },
+        "ports": [
+          [],
+          []
+        ],
+        "id": "_8fUYAYmb"
+      }
+    },
+    "edges": {}
+  },
+  "graphUIData": {
+    "_kxdXKNKJ": {
+      "x": 615.2721629903002,
+      "y": 131.3513120341
+    },
+    "_8fUYAYmb": {
+      "x": 473.84072592570016,
+      "y": -17.035769476300022
+    }
+  },
+  "labels": {
+    "Tf6lvZPx": {
+      "labelName": "signal",
+      "nodeId": "_8fUYAYmb",
+      "portIdx": 0
+    },
+    "jo2EQV6F": {
+      "labelName": "signal",
+      "nodeId": "_kxdXKNKJ",
+      "portIdx": 0
+    },
+    "UVdD7jM3": {
+      "labelName": "gnd",
+      "nodeId": "_8fUYAYmb",
+      "portIdx": 1
+    },
+    "yTa3XdTB": {
+      "labelName": "gnd",
+      "nodeId": "_kxdXKNKJ",
+      "portIdx": 1
+    }
+  }
+}
