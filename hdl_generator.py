@@ -31,15 +31,24 @@ class Connection:
     return bool(is_array)
 
 
-def tohdl_connector(connector: JsonNode, connections: List[Connection]) -> Tuple[str, str]:
+def tohdl_connector(connector: JsonNode, port_connections: List[Tuple[int, Connection]]) -> Tuple[str, str]:
   """Compiles a JsonNode representing a connector to HDL, returning the block class name and block definition."""
   assert connector.data.type.isidentifier() and connector.data.name.isidentifier()
   classname = connector.data.type + "_" + connector.data.name
+
+  port_types: dict[str, str] = {}
+  for portidx, connection in port_connections:
+    port_name = connector.data.ports[portidx].name
+    if not port_name.isidentifier():
+      raise JsonNetlistValidationError([connector.data.name, port_name], f"invalid port name")
+    port_type = [port[1].type for port in connection.ports if port[0] is not connector]
+    port_types[port_name] = ', '.join(port_type)
+
   connector_code = f"""\
 class {classname}(Block):
   def __init__(self):
     super().__init__()
-    # {list(map(lambda x: x.name, connections))}
+    # {port_types}
 """
   return classname, connector_code
 
@@ -98,7 +107,7 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
       raise JsonNetlistValidationError([node.data.name], f"invalid block class {block_class}")
 
     if 'PassiveConnector' in node.data.superClasses:
-      connector_connections = [connections_by_node_port[(node_id, port.idx)] for port in node.data.ports
+      connector_connections = [(port.idx, connections_by_node_port[(node_id, port.idx)]) for port in node.data.ports
                      if (node_id, port.idx) in connections_by_node_port]
       block_class, block_def = tohdl_connector(node, connector_connections)
       connectors_code.append(block_def)
