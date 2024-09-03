@@ -28,10 +28,10 @@ class Connection:
         if is_array is True:
           raise JsonNetlistValidationError([], f"mixed array and non-array ports in label {self.name}")
         is_array = False
-    return is_array
+    return bool(is_array)
 
 
-def tohdl_connector(connector: JsonNode, connections: List[Connection]) -> [str, str]:
+def tohdl_connector(connector: JsonNode, connections: List[Connection]) -> Tuple[str, str]:
   """Compiles a JsonNode representing a connector to HDL, returning the block class name and block definition."""
   assert connector.data.type.isidentifier() and connector.data.name.isidentifier()
   classname = connector.data.type + "_" + connector.data.name
