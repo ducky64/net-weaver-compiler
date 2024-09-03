@@ -2,7 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 from pydantic import ValidationError
 
-from netlist_compiler import JsonNetlist, compile_netlist, CompilerResult, CompilerError, JsonNetlistValidationError
+from netlist_compiler import JsonNetlist, compile_netlist, CompilerResult, CompilerError
+from hdl_generator import JsonNetlistValidationError
 
 
 app = Flask(__name__)

@@ -1,69 +1,10 @@
-from typing import Any, cast, Optional
+from typing import cast, Optional
 from pydantic import BaseModel
 
 import os.path
 from PolymorphicBlocks.edg import core, edgir
-
-
-class JsonNetPort(BaseModel):
-  nodeId: str  # unused, internal node ID
-  portIdx: int  # unused
-  name: str  # name of node, may be same as node ID
-  portName: str  # name of port (consistent w/ HDL)
-
-class JsonNodePort(BaseModel):
-  name: str  # name of port (consistent w/ HDL)
-  leftRightUpDown: str  # ignored
-  type: str  # type of port
-  array: bool  # whether port is an array
-  srcSinkBi: Optional[str]  # ignored
-  idx: int
-  elementOf: Optional[int] = None  # refers to idx of parent if array, otherwise None
-
-class JsonNodeArgParam(BaseModel):
-  name: str  # name of parameter (consistent w/ HDL)
-  type: str  # type of parameter, ...
-  default_value: Optional[Any]  # default value of parameter in library, if any
-  value: Optional[Any]  # value as specified by the user
-
-class JsonNodeData(BaseModel):
-  name: str  # user-facing name
-  type: str  # node class
-  superClasses: list[str]  # superclasses, excluding self type
-  ports: list[JsonNodePort]
-  argParams: list[JsonNodeArgParam]
-
-class JsonNode(BaseModel):
-  data: JsonNodeData
-  ports: list[list[str]]  # port names
-  id: str  # node ID
-
-# currently unused
-# class JsonEdgeTarget(BaseModel):
-#   node_id: str  # node ID
-#   idx: int  # port index, unused
-#   portName: str  # name of port (consistent w/ HDL)
-#
-# class JsonEdge(BaseModel):
-#   data: Any  # ignored
-#   src: JsonEdgeTarget
-#   dst: JsonEdgeTarget
-#   id: str  # ignored
-
-class JsonLabel(BaseModel):
-  labelName: str
-  nodeId: str
-  portIdx: int
-
-class JsonGraph(BaseModel):
-  nodes: dict[str, JsonNode]
-  # edges: dict[str, JsonEdge]  # currently unused
-
-class JsonNetlist(BaseModel):
-  nets: list[list[JsonNetPort]]
-  graph: JsonGraph
-  graphUIData: Any  # ignored
-  labels: dict[str, JsonLabel] = {}  # labels, if any - new feature
+from netweaver_interface import JsonNetlist
+from hdl_generator import tohdl_netlist
 
 
 class KicadFootprint(BaseModel):
@@ -94,123 +35,9 @@ class CompilerResult(BaseModel):
   errors: list[CompilerError] = []
 
 
-class JsonNetlistValidationError(Exception):
-  def __init__(self, path: list[str], desc: str):
-    super().__init__(f"{'.'.join(path)}: {desc}")
-    self.path = path
-    self.desc = desc
 
 
-def tohdl_netlist(netlist: JsonNetlist) -> str:
-  """Compiles the JsonNetlist to HDL, returning the HDL code."""
-  code = f"""\
-class MyModule(SimpleBoardTop):
-  def __init__(self):
-    super().__init__()
-"""
 
-  code += "\n"
-
-  for node_id, node in netlist.graph.nodes.items():
-    if not node.data.name.isidentifier():
-      raise JsonNetlistValidationError([node.data.name], f"invalid block name")
-    block_class = node.data.type
-    if not block_class.isidentifier():
-      raise JsonNetlistValidationError([node.data.name], f"invalid block class {block_class}")
-
-    args_elts = []
-    for arg_param in node.data.argParams:
-      if arg_param.default_value != arg_param.value and arg_param.value:
-        # parse and sanitize the value
-        if arg_param.type == 'int':
-          try:
-            arg_value = str(int(arg_param.value))
-          except ValueError:
-            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-int value {arg_param.value}")
-        elif arg_param.type == 'float':
-          try:
-            arg_value = str(float(arg_param.value))
-          except ValueError:
-            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-float value {arg_param.value}")
-        elif arg_param.type == 'range':
-          if not isinstance(arg_param.value, list) and len(arg_param.value) == 2:
-            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid value {arg_param.value}")
-          try:
-            arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
-          except ValueError:
-            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid range-int value {arg_param.value}")
-        elif arg_param.type == 'string':
-          raise JsonNetlistValidationError([node.data.name, arg_param.name], f"TODO: strings unsupported")
-        else:
-          raise JsonNetlistValidationError([node.data.name, arg_param.name], f"unknown arg-param type {arg_param.type}")
-
-        args_elts.append(f"{arg_param.name}={arg_value}")
-    code += f"    self.{node.data.name} = self.Block({block_class}({', '.join(args_elts)}))\n"
-  code += "\n"
-
-  labels_by_name: dict[str, list[JsonLabel]] = { }
-  if netlist.labels:
-    for id, label in netlist.labels.items():
-      labels_by_name.setdefault(label.labelName, []).append(label)
-
-  # generate labels first
-  for name, labels in labels_by_name.items():
-    port_hdls = []
-
-    is_array: Optional[bool] = None
-    for label in labels:
-      port_node = netlist.graph.nodes[label.nodeId]
-      if port_node.data.ports[label.portIdx].elementOf is not None:
-        continue  # ignored, request does not determine array-ness
-      elif port_node.data.ports[label.portIdx].array:
-        if is_array == False:
-          raise JsonNetlistValidationError([], f"mixed array and non-array ports in label {name}")
-        is_array = True
-      else:
-        if is_array == True:
-          raise JsonNetlistValidationError([], f"mixed array and non-array ports in label {name}")
-        is_array = False
-
-    for label in labels:
-      port_node = netlist.graph.nodes[label.nodeId]
-      port_port = port_node.data.ports[label.portIdx]
-      if not port_port.name.isidentifier():
-        raise JsonNetlistValidationError([], f"invalid port label {port_node.data.name}.{port_port.name}")
-      if port_port.elementOf is not None:  # array request
-        port_parent_port = port_node.data.ports[port_port.elementOf].name
-        if not port_parent_port.isidentifier():
-          raise JsonNetlistValidationError([], f"invalid port label {port_node.data.name}.{port_parent_port}")
-        if is_array:
-          port_hdls.append(f"self.{port_node.data.name}.{port_parent_port}.request_vector('{port_port.name}')")
-        else:
-          port_hdls.append(f"self.{port_node.data.name}.{port_parent_port}.request('{port_port.name}')")
-      else:  # single port
-        port_hdls.append(f"self.{port_node.data.name}.{port_port.name}")
-
-    code += f"    self.connect({', '.join(port_hdls)})\n"
-
-  # then directed edges
-  # TODO currently not supported in frontend
-  # for name, edge in netlist.graph.edges.items():
-  #   src_node = netlist.graph.nodes[edge.src.node_id]
-  #   src_port = src_node.data.ports[edge.src.idx]
-  #   dst_node = netlist.graph.nodes[edge.dst.node_id]
-  #   dst_port = dst_node.data.ports[edge.dst.idx]
-  #
-  #   if not edge.src.node_id.isidentifier() and src_port.name.isidentifier():
-  #     raise JsonNetlistValidationError([], f"invalid connect to {edge.src.node_id}.{src_port.name}")
-  #   if not edge.dst.node_id.isidentifier() and dst_port.name.isidentifier():
-  #     raise JsonNetlistValidationError([], f"invalid connect to {edge.dst.node_id}.{dst_port.name}")
-  #   src_hdl = f"self.{edge.src.node_id}.{src_port.name}"
-  #   if src_port.array and dst_port.array:
-  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request_vector()"
-  #   elif not src_port.array and dst_port.array:
-  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request()"
-  #   else:
-  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}"
-  #   code += f"    self.connect({src_hdl}, {dst_hdl})\n"
-
-  return code
 
 
 FOOTPRINT_LIBRARY_RELPATHS = [
@@ -221,7 +48,7 @@ FOOTPRINT_LIBRARY_RELPATHS = [
 ]
 
 
-def compile_netlist(netweave_netlist: JsonNetlist) -> CompilerResult:
+def compile_netlist(netweaver_netlist: JsonNetlist) -> CompilerResult:
   """Compiles the JsonNetlist to a KiCad netlist, returning the KiCad netlist along with a list of model
   validation errors (if any)."""
   code = f"""\
@@ -229,7 +56,7 @@ from PolymorphicBlocks.edg import *
 
 """
 
-  hdl = tohdl_netlist(netweave_netlist)
+  hdl = tohdl_netlist(netweaver_netlist)
   code += hdl
 
   code += """
