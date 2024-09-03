@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from netweaver_interface import JsonNetlist, JsonLabel, JsonNode, JsonNodePort
 
 
@@ -9,22 +9,96 @@ class JsonNetlistValidationError(Exception):
     self.desc = desc
 
 
-def tohdl_connector(connector: JsonNode, connections: List[JsonNodePort]) -> str:
-  pass
+class Connection:
+  def __init__(self, name: str, ports: list[Tuple[JsonNode, JsonNodePort]], labels: list[JsonLabel]):
+    self.name = name
+    self.ports = ports
+    self.labels = labels
+
+  def is_array(self) -> bool:
+    is_array: Optional[bool] = None
+    for (containing_node, port) in self.ports:  # sweep through connected to determine if an array
+      if port.elementOf is not None:
+        continue  # ignored, request does not determine array-ness
+      elif port.array:
+        if is_array is False:
+          raise JsonNetlistValidationError([], f"mixed array and non-array ports in connection {self.name}")
+        is_array = True
+      else:
+        if is_array is True:
+          raise JsonNetlistValidationError([], f"mixed array and non-array ports in label {self.name}")
+        is_array = False
+    return is_array
+
+
+def tohdl_connector(connector: JsonNode, connections: List[JsonNodePort]) -> [str, str]:
+  """Compiles a JsonNode representing a connector to HDL, returning the block class name and block definition."""
+  assert connector.data.type.isidentifier() and connector.data.name.isidentifier()
+  classname = connector.data.type + "_" + connector.data.name
+  connector_code = f"""\
+class {classname}(Block):
+  def __init__(self):
+    super().__init__()
+"""
+  return classname, connector_code
 
 
 def tohdl_netlist(netlist: JsonNetlist) -> str:
   """Compiles the JsonNetlist to HDL, returning the HDL code."""
-  connectors_code = []
+  # aggregate connections
+  labels_by_name: dict[str, list[JsonLabel]] = {}
+  for id, label in netlist.labels.items():
+    labels_by_name.setdefault(label.labelName, []).append(label)
+
+  connections_by_name: dict[str, Connection] = {}
+  connections_by_node_port: dict[Tuple[str, int], Connection] = {}
+  for name, labels in labels_by_name.items():
+    ports = []
+    for label in labels:
+      containing_node = netlist.graph.nodes[label.nodeId]
+      port = containing_node.data.ports[label.portIdx]
+      ports.append((containing_node, port))
+
+    connection = Connection(name, ports, labels)
+    connections_by_name[name] = connection
+    for label in labels:
+      assert (label.nodeId, label.portIdx) not in connections_by_node_port, "duplicate label"
+      connections_by_node_port[(label.nodeId, label.portIdx)] = connection
+
+  # then directed edges
+  # TODO currently not supported in frontend
+  # for name, edge in netlist.graph.edges.items():
+  #   src_node = netlist.graph.nodes[edge.src.node_id]
+  #   src_port = src_node.data.ports[edge.src.idx]
+  #   dst_node = netlist.graph.nodes[edge.dst.node_id]
+  #   dst_port = dst_node.data.ports[edge.dst.idx]
+  #
+  #   if not edge.src.node_id.isidentifier() and src_port.name.isidentifier():
+  #     raise JsonNetlistValidationError([], f"invalid connect to {edge.src.node_id}.{src_port.name}")
+  #   if not edge.dst.node_id.isidentifier() and dst_port.name.isidentifier():
+  #     raise JsonNetlistValidationError([], f"invalid connect to {edge.dst.node_id}.{dst_port.name}")
+  #   src_hdl = f"self.{edge.src.node_id}.{src_port.name}"
+  #   if src_port.array and dst_port.array:
+  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request_vector()"
+  #   elif not src_port.array and dst_port.array:
+  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request()"
+  #   else:
+  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}"
+  #   code += f"    self.connect({src_hdl}, {dst_hdl})\n"
 
   # declare blocks
   block_code = []
+  connectors_code = []
   for node_id, node in netlist.graph.nodes.items():
     if not node.data.name.isidentifier():
       raise JsonNetlistValidationError([node.data.name], f"invalid block name")
     block_class = node.data.type
     if not block_class.isidentifier():
       raise JsonNetlistValidationError([node.data.name], f"invalid block class {block_class}")
+
+    if 'PassiveConnector' in node.data.superClasses:
+      block_class, block_def = tohdl_connector(node, node.ports)
+      connectors_code.append(block_def)
 
     # fill in block args
     args_elts = []
@@ -56,72 +130,31 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
         args_elts.append(f"{arg_param.name}={arg_value}")
     block_code.append(f"self.{node.data.name} = self.Block({block_class}({', '.join(args_elts)}))")
 
-  labels_by_name: dict[str, list[JsonLabel]] = { }
-  if netlist.labels:
-    for id, label in netlist.labels.items():
-      labels_by_name.setdefault(label.labelName, []).append(label)
-
-  # generate labels first
+  # generate connect statements
   connections_code = []
-  for name, labels in labels_by_name.items():
+  for name, connection in connections_by_name.items():
     port_hdls = []
 
-    is_array: Optional[bool] = None
-    for label in labels:
-      port_node = netlist.graph.nodes[label.nodeId]
-      if port_node.data.ports[label.portIdx].elementOf is not None:
-        continue  # ignored, request does not determine array-ness
-      elif port_node.data.ports[label.portIdx].array:
-        if is_array == False:
-          raise JsonNetlistValidationError([], f"mixed array and non-array ports in label {name}")
-        is_array = True
-      else:
-        if is_array == True:
-          raise JsonNetlistValidationError([], f"mixed array and non-array ports in label {name}")
-        is_array = False
-
-    for label in labels:
-      port_node = netlist.graph.nodes[label.nodeId]
-      port_port = port_node.data.ports[label.portIdx]
-      if not port_port.name.isidentifier():
-        raise JsonNetlistValidationError([], f"invalid port label {port_node.data.name}.{port_port.name}")
-      if port_port.elementOf is not None:  # array request
-        port_parent_port = port_node.data.ports[port_port.elementOf].name
+    for (containing_node, port) in connection.ports:
+      if not port.name.isidentifier():
+        raise JsonNetlistValidationError([], f"invalid port label {containing_node.data.name}.{port.name}")
+      if port.elementOf is not None:  # array request
+        port_parent_port = containing_node.data.ports[port.elementOf].name
         if not port_parent_port.isidentifier():
-          raise JsonNetlistValidationError([], f"invalid port label {port_node.data.name}.{port_parent_port}")
-        if is_array:
-          port_hdls.append(f"self.{port_node.data.name}.{port_parent_port}.request_vector('{port_port.name}')")
+          raise JsonNetlistValidationError([], f"invalid port label {containing_node.data.name}.{port_parent_port}")
+        if connection.is_array():
+          port_hdls.append(f"self.{containing_node.data.name}.{port_parent_port}.request_vector('{port.name}')")
         else:
-          port_hdls.append(f"self.{port_node.data.name}.{port_parent_port}.request('{port_port.name}')")
+          port_hdls.append(f"self.{containing_node.data.name}.{port_parent_port}.request('{port.name}')")
       else:  # single port
-        port_hdls.append(f"self.{port_node.data.name}.{port_port.name}")
+        port_hdls.append(f"self.{containing_node.data.name}.{port.name}")
 
     connections_code.append(f"self.connect({', '.join(port_hdls)})")
 
-  # then directed edges
-  # TODO currently not supported in frontend
-  # for name, edge in netlist.graph.edges.items():
-  #   src_node = netlist.graph.nodes[edge.src.node_id]
-  #   src_port = src_node.data.ports[edge.src.idx]
-  #   dst_node = netlist.graph.nodes[edge.dst.node_id]
-  #   dst_port = dst_node.data.ports[edge.dst.idx]
-  #
-  #   if not edge.src.node_id.isidentifier() and src_port.name.isidentifier():
-  #     raise JsonNetlistValidationError([], f"invalid connect to {edge.src.node_id}.{src_port.name}")
-  #   if not edge.dst.node_id.isidentifier() and dst_port.name.isidentifier():
-  #     raise JsonNetlistValidationError([], f"invalid connect to {edge.dst.node_id}.{dst_port.name}")
-  #   src_hdl = f"self.{edge.src.node_id}.{src_port.name}"
-  #   if src_port.array and dst_port.array:
-  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request_vector()"
-  #   elif not src_port.array and dst_port.array:
-  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}.request()"
-  #   else:
-  #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}"
-  #   code += f"    self.connect({src_hdl}, {dst_hdl})\n"
-
+  # compose into top-level code
   newline = '\n'  # not allowed in f-strings
   return f"""\
-{newline.join(connectors_code)}\
+{''.join(map(lambda c: c + newline + newline, connectors_code))}\
 class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
