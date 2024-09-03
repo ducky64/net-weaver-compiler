@@ -15,10 +15,10 @@ def tohdl_connector(connector: JsonNode, connections: List[JsonNodePort]) -> str
 
 def tohdl_netlist(netlist: JsonNetlist) -> str:
   """Compiles the JsonNetlist to HDL, returning the HDL code."""
-  connectors_code = f""""""
+  connectors_code = []
 
   # declare blocks
-  block_code = ""
+  block_code = []
   for node_id, node in netlist.graph.nodes.items():
     if not node.data.name.isidentifier():
       raise JsonNetlistValidationError([node.data.name], f"invalid block name")
@@ -54,7 +54,7 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
           raise JsonNetlistValidationError([node.data.name, arg_param.name], f"unknown arg-param type {arg_param.type}")
 
         args_elts.append(f"{arg_param.name}={arg_value}")
-    block_code += f"    self.{node.data.name} = self.Block({block_class}({', '.join(args_elts)}))\n"
+    block_code.append(f"self.{node.data.name} = self.Block({block_class}({', '.join(args_elts)}))")
 
   labels_by_name: dict[str, list[JsonLabel]] = { }
   if netlist.labels:
@@ -62,7 +62,7 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
       labels_by_name.setdefault(label.labelName, []).append(label)
 
   # generate labels first
-  connections_code = ""
+  connections_code = []
   for name, labels in labels_by_name.items():
     port_hdls = []
 
@@ -96,7 +96,7 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
       else:  # single port
         port_hdls.append(f"self.{port_node.data.name}.{port_port.name}")
 
-    connections_code += f"    self.connect({', '.join(port_hdls)})\n"
+    connections_code.append(f"self.connect({', '.join(port_hdls)})")
 
   # then directed edges
   # TODO currently not supported in frontend
@@ -119,10 +119,14 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
   #     dst_hdl = f"self.{edge.dst.node_id}.{dst_port.name}"
   #   code += f"    self.connect({src_hdl}, {dst_hdl})\n"
 
+  newline = '\n'  # not allowed in f-strings
   return f"""\
+{newline.join(connectors_code)}\
 class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 
-{block_code}
-{connections_code}"""
+{newline.join(map(lambda c: "    " + c, block_code))}
+
+{newline.join(map(lambda c: "    " + c, connections_code))}
+"""
