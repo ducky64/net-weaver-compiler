@@ -1,5 +1,6 @@
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Type
 from netweaver_interface import JsonNetlist, JsonLabel, JsonNode, JsonNodePort
+from PolymorphicBlocks import edg
 
 
 class JsonNetlistValidationError(Exception):
@@ -31,24 +32,57 @@ class Connection:
     return bool(is_array)
 
 
+# connector port mapping - for each set of incoming port types, the connector port type
+kConnectorTypeMap = [
+  ({edg.VoltageSink}, edg.VoltageSource),
+  ({edg.VoltageSource, edg.VoltageSink}, edg.VoltageSink),
+  ({edg.DigitalSource, edg.DigitalSink, edg.DigitalBidir}, edg.DigitalBidir),
+  ({edg.AnalogSink}, edg.AnalogSource),
+  ({edg.AnalogSource, edg.AnalogSink}, edg.AnalogSink),
+  ({edg.Ground, edg.GroundReference}, edg.Ground)
+]
+def get_connector_type(err_path: list[str], port_types: list[Type[edg.CircuitPort]]) -> Type[edg.CircuitPort]:
+  """For a list of port types of incoming connections, return the (likely) port type that is connectable to them all,
+  preferring required but not-connected ports, then any free port in the link."""
+  # choose from kConnectorTypeMap where the port_types is a subset of the key AND overlap is not zero
+  for incoming_ports, connector_type in kConnectorTypeMap:
+    if incoming_ports.intersection(port_types) and incoming_ports.issuperset(port_types):
+      return connector_type
+  raise JsonNetlistValidationError(err_path, f"no connector type for {port_types}")
+
+
 def tohdl_connector(connector: JsonNode, port_connections: List[Tuple[int, Connection]]) -> Tuple[str, str]:
   """Compiles a JsonNode representing a connector to HDL, returning the block class name and block definition."""
   assert connector.data.type.isidentifier() and connector.data.name.isidentifier()
   classname = connector.data.type + "_" + connector.data.name
+  port_decls = []
 
-  port_types: dict[str, str] = {}
   for portidx, connection in port_connections:
     port_name = connector.data.ports[portidx].name
     if not port_name.isidentifier():
-      raise JsonNetlistValidationError([connector.data.name, port_name], f"invalid port name")
-    port_type = [port[1].type for port in connection.ports if port[0] is not connector]
-    port_types[port_name] = ', '.join(port_type)
+      raise JsonNetlistValidationError(err_path, f"invalid port name")
+    err_path = [connector.data.name, port_name]
 
+    # aggregate incoming connection by types
+    connection_ports_str = [port[1].type for port in connection.ports if port[0] is not connector]
+    connection_port_types = []
+    for connection_port_str in connection_ports_str:
+      if not hasattr(edg, connection_port_str):
+        raise JsonNetlistValidationError(err_path, f"invalid port type {connection_port_str}")
+      port_class = getattr(edg, connection_port_str)
+      if connection.is_array():
+        raise JsonNetlistValidationError(err_path, f"can't connect array to connectors")
+      connection_port_types.append(port_class)
+
+    connector_port_type = get_connector_type(err_path, connection_port_types).__name__
+    port_decls.append(f"self.{port_name} = self.Port({connector_port_type}())")
+
+  newline = '\n'  # not allowed in f-strings
   connector_code = f"""\
 class {classname}(Block):
   def __init__(self):
     super().__init__()
-    # {port_types}
+{newline.join(map(lambda c: "    " + c, port_decls))}
 """
   return classname, connector_code
 
@@ -114,32 +148,33 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
 
     # fill in block args
     args_elts = []
-    for arg_param in node.data.argParams:
-      if arg_param.default_value != arg_param.value and arg_param.value:
-        # parse and sanitize the value
-        if arg_param.type == 'int':
-          try:
-            arg_value = str(int(arg_param.value))
-          except ValueError:
-            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-int value {arg_param.value}")
-        elif arg_param.type == 'float':
-          try:
-            arg_value = str(float(arg_param.value))
-          except ValueError:
-            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-float value {arg_param.value}")
-        elif arg_param.type == 'range':
-          if not isinstance(arg_param.value, list) and len(arg_param.value) == 2:
-            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid value {arg_param.value}")
-          try:
-            arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
-          except ValueError:
-            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid range-int value {arg_param.value}")
-        elif arg_param.type == 'string':
-          raise JsonNetlistValidationError([node.data.name, arg_param.name], f"TODO: strings unsupported")
-        else:
-          raise JsonNetlistValidationError([node.data.name, arg_param.name], f"unknown arg-param type {arg_param.type}")
+    if 'PassiveConnector' not in node.data.superClasses:  # PassiveConnector args are handled in the connector block
+      for arg_param in node.data.argParams:
+        if arg_param.default_value != arg_param.value and arg_param.value:
+          # parse and sanitize the value
+          if arg_param.type == 'int':
+            try:
+              arg_value = str(int(arg_param.value))
+            except ValueError:
+              raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-int value {arg_param.value}")
+          elif arg_param.type == 'float':
+            try:
+              arg_value = str(float(arg_param.value))
+            except ValueError:
+              raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-float value {arg_param.value}")
+          elif arg_param.type == 'range':
+            if not isinstance(arg_param.value, list) and len(arg_param.value) == 2:
+              raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid value {arg_param.value}")
+            try:
+              arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
+            except ValueError:
+              raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid range-int value {arg_param.value}")
+          elif arg_param.type == 'string':
+            raise JsonNetlistValidationError([node.data.name, arg_param.name], f"TODO: strings unsupported")
+          else:
+            raise JsonNetlistValidationError([node.data.name, arg_param.name], f"unknown arg-param type {arg_param.type}")
 
-        args_elts.append(f"{arg_param.name}={arg_value}")
+          args_elts.append(f"{arg_param.name}={arg_value}")
     block_code.append(f"self.{node.data.name} = self.Block({block_class}({', '.join(args_elts)}))")
 
   # generate connect statements

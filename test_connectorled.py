@@ -5,11 +5,18 @@ from netlist_compiler import tohdl_netlist, compile_netlist, JsonNetlist
 
 
 EXPECTED_HDL = """\
+class PinHeader254Vertical_PinHeader254Vertical(Block):
+  def __init__(self):
+    super().__init__()
+    self.port_0 = self.Port(DigitalBidir())
+    self.port_1 = self.Port(Ground())
+
+
 class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 
-    self.PinHeader254Vertical = self.Block(PinHeader254Vertical(length=3))
+    self.PinHeader254Vertical = self.Block(PinHeader254Vertical_PinHeader254Vertical())
     self.IndicatorLed = self.Block(IndicatorLed())
 
     self.connect(self.IndicatorLed.signal, self.PinHeader254Vertical.port_0)
