@@ -75,7 +75,7 @@ def tohdl_connector(connector: JsonNode, port_connections: List[Tuple[int, Conne
       connection_port_types.append(port_class)
 
     connector_port_type = get_connector_type(err_path, connection_port_types).__name__
-    port_decls.append(f"self.{port_name} = self.Port({connector_port_type}())")
+    port_decls.append(f"self.{port_name} = self.Port({connector_port_type}(), optional=True)")
 
   newline = '\n'  # not allowed in f-strings
   connector_code = f"""\
