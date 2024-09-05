@@ -51,7 +51,8 @@ def get_connector_type(err_path: list[str], port_types: list[Type[edg.CircuitPor
   raise JsonNetlistValidationError(err_path, f"no connector type for {port_types}")
 
 
-def tohdl_connector(connector: JsonNode, port_connections: List[Tuple[int, Connection]]) -> Tuple[str, str]:
+def tohdl_connector(connector: JsonNode, connector_class_name: str, connector_args: str,
+                    port_connections: List[Tuple[int, Connection]]) -> Tuple[str, str]:
   """Compiles a JsonNode representing a connector to HDL, returning the block class name and block definition."""
   assert connector.data.type.isidentifier() and connector.data.name.isidentifier()
   classname = connector.data.type + "_" + connector.data.name
@@ -59,8 +60,10 @@ def tohdl_connector(connector: JsonNode, port_connections: List[Tuple[int, Conne
 
   for portidx, connection in port_connections:
     port_name = connector.data.ports[portidx].name
-    if not port_name.isidentifier():
-      raise JsonNetlistValidationError(err_path, f"invalid port name")
+    if not port_name.isidentifier() or not port_name.startswith('port_'):
+      raise JsonNetlistValidationError([connector.data.name, port_name], f"invalid port name")
+    port_num = int(port_name[5:]) + 1
+
     err_path = [connector.data.name, port_name]
 
     # aggregate incoming connection by types
@@ -75,14 +78,19 @@ def tohdl_connector(connector: JsonNode, port_connections: List[Tuple[int, Conne
       connection_port_types.append(port_class)
 
     connector_port_type = get_connector_type(err_path, connection_port_types).__name__
-    port_decls.append(f"self.{port_name} = self.Port({connector_port_type}(), optional=True)")
+    port_decls.append(f"self.{port_name} = self.Export(self._conn.pins.request('{port_num}').adapt_to({connector_port_type}()), optional=True)")
 
+  # globals['__builtins__'] is added since exec top-level classes appear in __builtin__ scope,
+  # and modules and top-level in exec() do not share the same scope
   newline = '\n'  # not allowed in f-strings
   connector_code = f"""\
 class {classname}(Block):
   def __init__(self):
     super().__init__()
+    self._conn = self.Block({connector_class_name}({connector_args}))
 {newline.join(map(lambda c: "    " + c, port_decls))}
+
+globals()['__builtins__']['{classname}'] = {classname}
 """
   return classname, connector_code
 
@@ -131,7 +139,7 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
   #   code += f"    self.connect({src_hdl}, {dst_hdl})\n"
 
   # declare blocks
-  block_code = []
+  blocks_code = []
   connectors_code = []
   for node_id, node in netlist.graph.nodes.items():
     if not node.data.name.isidentifier():
@@ -140,42 +148,46 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
     if not block_class.isidentifier():
       raise JsonNetlistValidationError([node.data.name], f"invalid block class {block_class}")
 
-    if 'PassiveConnector' in node.data.superClasses:
-      connector_connections = [(port.idx, connections_by_node_port[(node_id, port.idx)]) for port in node.data.ports
-                     if (node_id, port.idx) in connections_by_node_port]
-      block_class, block_def = tohdl_connector(node, connector_connections)
-      connectors_code.append(block_def)
-
     # fill in block args
     args_elts = []
-    if 'PassiveConnector' not in node.data.superClasses:  # PassiveConnector args are handled in the connector block
-      for arg_param in node.data.argParams:
-        if arg_param.default_value != arg_param.value and arg_param.value:
-          # parse and sanitize the value
-          if arg_param.type == 'int':
-            try:
-              arg_value = str(int(arg_param.value))
-            except ValueError:
-              raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-int value {arg_param.value}")
-          elif arg_param.type == 'float':
-            try:
-              arg_value = str(float(arg_param.value))
-            except ValueError:
-              raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-float value {arg_param.value}")
-          elif arg_param.type == 'range':
-            if not isinstance(arg_param.value, list) and len(arg_param.value) == 2:
-              raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid value {arg_param.value}")
-            try:
-              arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
-            except ValueError:
-              raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid range-int value {arg_param.value}")
-          elif arg_param.type == 'string':
-            raise JsonNetlistValidationError([node.data.name, arg_param.name], f"TODO: strings unsupported")
-          else:
-            raise JsonNetlistValidationError([node.data.name, arg_param.name], f"unknown arg-param type {arg_param.type}")
+    for arg_param in node.data.argParams:
+      if arg_param.default_value != arg_param.value and arg_param.value:
+        # parse and sanitize the value
+        if arg_param.type == 'int':
+          try:
+            arg_value = str(int(arg_param.value))
+          except ValueError:
+            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-int value {arg_param.value}")
+        elif arg_param.type == 'float':
+          try:
+            arg_value = str(float(arg_param.value))
+          except ValueError:
+            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid non-float value {arg_param.value}")
+        elif arg_param.type == 'range':
+          if not isinstance(arg_param.value, list) and len(arg_param.value) == 2:
+            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid value {arg_param.value}")
+          try:
+            arg_value = f"({float(arg_param.value[0])}, {float(arg_param.value[1])})"
+          except ValueError:
+            raise JsonNetlistValidationError([node.data.name, arg_param], f"invalid range-int value {arg_param.value}")
+        elif arg_param.type == 'string':
+          raise JsonNetlistValidationError([node.data.name, arg_param.name], f"TODO: strings unsupported")
+        else:
+          raise JsonNetlistValidationError([node.data.name, arg_param.name], f"unknown arg-param type {arg_param.type}")
 
-          args_elts.append(f"{arg_param.name}={arg_value}")
-    block_code.append(f"self.{node.data.name} = self.Block({block_class}({', '.join(args_elts)}))")
+        args_elts.append(f"{arg_param.name}={arg_value}")
+    block_args_code = ', '.join(args_elts)
+
+    if 'PassiveConnector' in node.data.superClasses:  # PassiveConnector args are handled in the connector block
+      connector_connections = [(port.idx, connections_by_node_port[(node_id, port.idx)]) for port in node.data.ports
+                               if (node_id, port.idx) in connections_by_node_port]
+      block_class, block_def = tohdl_connector(node, block_class, block_args_code, connector_connections)
+      connectors_code.append(block_def)
+      block_code = f"self.{node.data.name} = self.Block({block_class}())"
+    else:
+      block_code = f"self.{node.data.name} = self.Block({block_class}({block_args_code}))"
+
+    blocks_code.append(block_code)
 
   # generate connect statements
   connections_code = []
@@ -206,7 +218,7 @@ class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 
-{newline.join(map(lambda c: "    " + c, block_code))}
+{newline.join(map(lambda c: "    " + c, blocks_code))}
 
 {newline.join(map(lambda c: "    " + c, connections_code))}
 """

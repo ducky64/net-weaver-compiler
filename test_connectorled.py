@@ -8,8 +8,11 @@ EXPECTED_HDL = """\
 class PinHeader254Vertical_PinHeader254Vertical(Block):
   def __init__(self):
     super().__init__()
-    self.port_0 = self.Port(DigitalBidir(), optional=True)
-    self.port_1 = self.Port(Ground(), optional=True)
+    self._conn = self.Block(PinHeader254Vertical(length=3))
+    self.port_0 = self.Export(self._conn.pins.request('1').adapt_to(DigitalBidir()), optional=True)
+    self.port_1 = self.Export(self._conn.pins.request('2').adapt_to(Ground()), optional=True)
+
+globals()['__builtins__']['PinHeader254Vertical_PinHeader254Vertical'] = PinHeader254Vertical_PinHeader254Vertical
 
 
 class MyModule(SimpleBoardTop):

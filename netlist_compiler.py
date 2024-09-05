@@ -35,11 +35,6 @@ class CompilerResult(BaseModel):
   errors: list[CompilerError] = []
 
 
-
-
-
-
-
 FOOTPRINT_LIBRARY_RELPATHS = [
   'footprints/kicad-footprints',
   'footprints/kiswitch/library/footprints',
