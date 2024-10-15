@@ -15,7 +15,7 @@ COPY footprints/ ./footprints/
 COPY resources/ ./resources/
 COPY PolymorphicBlocks/ ./PolymorphicBlocks/
 
-COPY app.py netweaver_interface.py netlist_compiler.py svgpcb_compiler.py ./
+COPY *.py ./
 ENV FLASK_RUN_HOST=0.0.0.0
 
 EXPOSE 80
