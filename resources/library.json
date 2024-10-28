@@ -157,7 +157,7 @@
         }
       ],
       "is_abstract": false,
-      "docstring": null
+      "docstring": "Bipolar stepper motor driver with microstepping (1:2/4/8/16) and current limiting. 8-35V input, up to 2A."
     },
     {
       "name": "",
@@ -439,6 +439,41 @@
       ],
       "is_abstract": false,
       "docstring": "AL8861 buck LED driver."
+    },
+    {
+      "name": "",
+      "type": "Amphenol901143",
+      "superClasses": [
+        "SmaFConnector",
+        "SmaConnector",
+        "RfConnector",
+        "Connector"
+      ],
+      "ports": [
+        {
+          "name": "sig",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "PTH right-angle SMA-F connector"
     },
     {
       "name": "",
@@ -1123,6 +1158,16 @@
           "hint_array_direction": null,
           "required": true,
           "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
         }
       ],
       "argParams": [
@@ -1464,7 +1509,10 @@
         {
           "name": "reset_threshold",
           "type": "range",
-          "default_value": null,
+          "default_value": [
+            2.88,
+            2.98
+          ],
           "docstring": null
         }
       ],
@@ -1655,6 +1703,83 @@
       "argParams": [],
       "is_abstract": false,
       "docstring": "16-bit ambient light sensor, 1-65535 lx"
+    },
+    {
+      "name": "",
+      "type": "BidirectionaLevelShifter",
+      "superClasses": [
+        "Interface"
+      ],
+      "ports": [
+        {
+          "name": "lv_pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "lv_io",
+          "type": "DigitalBidir",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "hv_pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "hv_io",
+          "type": "DigitalBidir",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "lv_res",
+          "type": "range",
+          "default_value": [
+            4465.0,
+            4935.0
+          ],
+          "docstring": null
+        },
+        {
+          "name": "hv_res",
+          "type": "range",
+          "default_value": [
+            4465.0,
+            4935.0
+          ],
+          "docstring": null
+        },
+        {
+          "name": "src_hint",
+          "type": "str",
+          "default_value": "",
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "Bidirectional level shifter for low(ish) frequency signals.\nCircuit design from Phillips AN97055, https://cdn-shop.adafruit.com/datasheets/an97055.pdf\nWhen both sides are floating or driving high, the FET is off and the pullups provide the high signal.\nWhen the LV side drives low, the FET source goes to ground, putting the FET into conduction and pulling HV low.\nWhen the HV side drives low, the body diode pulls the FET source low, then goes into conduction.\n\nUse infinity resistance to not generate a resistor, for example if it is known there is already a resistor\non that side.\n\nsrc_hint = 'lv' | 'hv' | '' determines the 'source' side to help the electronics model resolve directionality\nand does not affect circuit generation or functionality.\nIf empty, both sides are assumed to be able to drive the shifter and must have voltages and output thresholds\nmodeled. TODO: this mode may be brittle"
     },
     {
       "name": "",
@@ -2214,6 +2339,36 @@
       ],
       "is_abstract": false,
       "docstring": "Two test points for CAN controller-side TXD and RXD"
+    },
+    {
+      "name": "",
+      "type": "CanDiffTestPoint",
+      "superClasses": [
+        "TypedTestPoint",
+        "Testing"
+      ],
+      "ports": [
+        {
+          "name": "io",
+          "type": "CanDiffPort",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "tp_name",
+          "type": "str",
+          "default_value": "",
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "Two test points for CAN differential-side canh and canl"
     },
     {
       "name": "",
@@ -3580,6 +3735,200 @@
       ],
       "is_abstract": false,
       "docstring": "Opamp differential amplifier, outputs the difference between the input nodes, scaled by some factor,\nand offset from some reference node.\nThis implementation uses the same resistance for the two input resistors (R1, R2),\nand the same resistance for the feedback and reference resistors (Rf, Rg).\nFrom https://en.wikipedia.org/wiki/Operational_amplifier_applications#Differential_amplifier_(difference_amplifier):\nVout = Rf/R1 * (Vp - Vn)\n\nImpedance equations from https://e2e.ti.com/blogs_/archives/b/precisionhub/posts/overlooking-the-obvious-the-input-impedance-of-a-difference-amplifier\n  (ignoring the opamp input impedances, which we assume are >> the resistors)\nRin,n = R1 / (1 - (Rg / (R2+Rg)) * (Vin,n / Vin,p))\nRin,p = R2 + Rg\nRout = opamp output impedance - TODO: is this correct?\n\nratio specifies Rf/R1, the amplification ratio."
+    },
+    {
+      "name": "",
+      "type": "DifferentialLLowPassFilter",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "in1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "in2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "freq",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "src_r",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "src_x",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "snk_r",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "snk_x",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "voltage",
+          "type": "range",
+          "default_value": null,
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": null
+    },
+    {
+      "name": "",
+      "type": "DifferentialLcLowpassFilter",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "in1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "in2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "freq_cutoff",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "inductance",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "input_res",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "freq",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "current",
+          "type": "range",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "voltage",
+          "type": "range",
+          "default_value": null,
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "Differential LC lowpass filter, commonly used as an EMC filter in the NFC analog frontend\nInput resistance is used to calculate the output impedance"
     },
     {
       "name": "",
@@ -7501,6 +7850,118 @@
     },
     {
       "name": "",
+      "type": "FlirLepton",
+      "superClasses": [
+        "Sensor"
+      ],
+      "ports": [
+        {
+          "name": "reset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr_io",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": "3.0v IO voltage including shutter, IOs are 3.3v compatible from +0.6v tolerance rating"
+        },
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": "2.8v"
+        },
+        {
+          "name": "pwr_core",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": "1.2v core voltage"
+        },
+        {
+          "name": "shutdown",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "spi",
+          "type": "SpiPeripheral",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": "Video over SPI"
+        },
+        {
+          "name": "cs",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "cci",
+          "type": "I2cTarget",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": "I2C-like Command and Control Interface"
+        },
+        {
+          "name": "vsync",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "Optional frame-sync output"
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "Series of socketed thermal cameras, 8.7Hz at either 80x60 or 160x120 resolution (depending on sensor) and\n<50mK (35mK typical) NETD.\nOnly the part number for the socket is generated, the sensor (a $100+ part) must be purchased separately."
+    },
+    {
+      "name": "",
       "type": "FootprintPassiveConnector",
       "superClasses": [
         "PassiveConnector"
@@ -9273,6 +9734,79 @@
     },
     {
       "name": "",
+      "type": "Ina219",
+      "superClasses": [
+        "CurrentSensor",
+        "Sensor"
+      ],
+      "ports": [
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "i2c",
+          "type": "I2cTarget",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "sense_pos",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "sense_neg",
+          "type": "VoltageSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "shunt_resistor",
+          "type": "range",
+          "default_value": [
+            0.0019,
+            0.0021000000000000003
+          ],
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "Current/voltage/power monitor with I2C interface"
+    },
+    {
+      "name": "",
       "type": "IndicatorLed",
       "superClasses": [
         "Light",
@@ -10401,6 +10935,9 @@
       "type": "JlcAntenna",
       "superClasses": [
         "Antenna",
+        "SelectorFootprint",
+        "SelectorArea",
+        "PartsTablePart",
         "Interface"
       ],
       "ports": [
@@ -10413,6 +10950,16 @@
           "hint_array_direction": null,
           "required": true,
           "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
         }
       ],
       "argParams": [],
@@ -10421,8 +10968,24 @@
     },
     {
       "name": "",
+      "type": "JlcBaseFet",
+      "superClasses": [
+        "SelectorFootprint",
+        "SelectorArea",
+        "PartsTablePart"
+      ],
+      "ports": [],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": null
+    },
+    {
+      "name": "",
       "type": "JlcOscillator",
       "superClasses": [
+        "SelectorFootprint",
+        "SelectorArea",
+        "PartsTablePart",
         "Oscillator",
         "DiscreteApplication"
       ],
@@ -10464,8 +11027,31 @@
     },
     {
       "name": "",
+      "type": "JlcPartsBase",
+      "superClasses": [
+        "SelectorFootprint",
+        "SelectorArea",
+        "PartsTablePart"
+      ],
+      "ports": [],
+      "argParams": [
+        {
+          "name": "require_basic_part",
+          "type": "bool",
+          "default_value": 0.0,
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "Base class parsing parts from https://github.com/yaqwsx/jlcparts"
+    },
+    {
+      "name": "",
       "type": "JlcResistorArray",
       "superClasses": [
+        "SelectorFootprint",
+        "SelectorArea",
+        "PartsTablePart",
         "ResistorArray",
         "MultipackDevice"
       ],
@@ -10892,6 +11478,92 @@
       ],
       "is_abstract": false,
       "docstring": "L78Lxx high(er) input voltage linear regulator in SOT-89.\n  "
+    },
+    {
+      "name": "",
+      "type": "LLowPassFilterWith2HNotch",
+      "superClasses": [
+        "AnalogFilter",
+        "Filter"
+      ],
+      "ports": [
+        {
+          "name": "input",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "output",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "frequency",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "src_resistance",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "src_reactance",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "load_resistance",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "tolerance",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "voltage",
+          "type": "range",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "current",
+          "type": "range",
+          "default_value": null,
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "L filter for impedance matching for RF with an overlaid second-harmonic LC notch filter.\nThe target reactance is given by the L filter.\nThen, the L and C values are from the simultaneous solution of:\nthe parallel reactance equation, at bandpass frequency w:\n  x_L = w*L\n  x_C = -1/(w*C)\n  x_parallel = 1/(1/x_L+1/x_C),\nthe LC tank equation, at DIFFERENT bandstop frequency at the second harmonic w_bp = 2*w:\n  w_bp = 1/(sqrt(l*c))\nsolving both gives a new L of 3/4 the baseline L"
     },
     {
       "name": "",
@@ -13602,6 +14274,136 @@
     },
     {
       "name": "",
+      "type": "NfcAntenna",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "ant1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "ant2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "ant_footprint",
+          "type": "str",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "freq",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "inductance",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "resistance",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "capacitance",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "NFC antenna, also calculates the complex impedance from series-LRC parameters.\nIn this model, the L and R are in series, and the C is in parallel with the LR stack.\nAs in https://www.nxp.com/docs/en/application-note/AN13219.pdf"
+    },
+    {
+      "name": "",
+      "type": "NfcAntennaDampening",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "in1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "in2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "ant1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "ant2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "target_q",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "ant_r",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "ant_x",
+          "type": "float",
+          "default_value": null,
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "Differential antenna dampening circuit, two inline resistors to achieve some target Q\n    "
+    },
+    {
+      "name": "",
       "type": "Nhd_312_25664uc",
       "superClasses": [
         "Oled",
@@ -15149,6 +15951,22 @@
     },
     {
       "name": "",
+      "type": "PartsTablePart",
+      "superClasses": [],
+      "ports": [],
+      "argParams": [
+        {
+          "name": "part",
+          "type": "str",
+          "default_value": "",
+          "docstring": null
+        }
+      ],
+      "is_abstract": true,
+      "docstring": "An interface mixin for a part that is selected from a table, defining parameters to allow manual part selection\nas well as matching parts."
+    },
+    {
+      "name": "",
       "type": "PassiveConnector",
       "superClasses": [],
       "ports": [
@@ -15375,6 +16193,76 @@
       ],
       "is_abstract": false,
       "docstring": "8 bit I2C IO expander with 'quasi-bidirectional IOs'"
+    },
+    {
+      "name": "",
+      "type": "Pe4259",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "rf1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "rf2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "rfc",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "ctrl",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vdd",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "RF switch between 10 MHz to 3000 MHz, 1.8-3.3v input.\nRequires all RF pins be held at 0v or are DC-blocked with a series cap.\nTODO: perhaps a RfSwitch base class? maybe some relation to AnalogSwitch? (though not valid at DC)"
     },
     {
       "name": "",
@@ -15992,6 +16880,444 @@
       ],
       "is_abstract": false,
       "docstring": "Reverse polarity protection using a PMOS. This method has lower power loss over diode-based protection.\n100R-330R is good but 1k-50k can be used for continuous load.\nRef: https://components101.com/articles/design-guide-pmos-mosfet-for-reverse-voltage-polarity-protection"
+    },
+    {
+      "name": "",
+      "type": "Pn7160",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "reset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr_io",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "i2c",
+          "type": "I2cTarget",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "irq",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "Multi-protocol NFC controller, up to 1.3W output power, in I2C ('A' suffix)\n    "
+    },
+    {
+      "name": "",
+      "type": "Pn7160RxFilter",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "in1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "in2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "resistance",
+          "type": "range",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "capacitance",
+          "type": "range",
+          "default_value": null,
+          "docstring": null
+        },
+        {
+          "name": "voltage",
+          "type": "range",
+          "default_value": null,
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": null
+    },
+    {
+      "name": "",
+      "type": "Pn7160_Device",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "vss",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vbat",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vddup",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vddpad",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vdd",
+          "type": "VoltageSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vddmid",
+          "type": "VoltageSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vddtx",
+          "type": "VoltageSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "xtal",
+          "type": "CrystalDriver",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "tx1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "tx2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "rxp",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "rxn",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "i2c",
+          "type": "I2cTarget",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "irq",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "ven",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": null
+    },
+    {
+      "name": "",
+      "type": "PololuA4988",
+      "superClasses": [
+        "WrapperFootprintBlock"
+      ],
+      "ports": [
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr_logic",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "step",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "dir",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "enable",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "disables FET outputs when high"
+        },
+        {
+          "name": "reset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "forces translator to Home state when low"
+        },
+        {
+          "name": "sleep",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "disables device (to reduce current draw) when low"
+        },
+        {
+          "name": "out1a",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out1b",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out2a",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "out2b",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "step_resolution",
+          "type": "int",
+          "default_value": 16,
+          "docstring": "microstepping resolution (1, 2, 4, 8, or 16)"
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "Pololu breakout board for the A4988 stepper driver. Adjustable current limit with onboard trimpot."
     },
     {
       "name": "",
@@ -16800,6 +18126,39 @@
     },
     {
       "name": "",
+      "type": "RfConnectorAntenna",
+      "superClasses": [
+        "Antenna",
+        "Interface"
+      ],
+      "ports": [
+        {
+          "name": "a",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "RF connector used as an antenna"
+    },
+    {
+      "name": "",
       "type": "Rp2040",
       "superClasses": [
         "Microcontroller",
@@ -17152,6 +18511,45 @@
       "argParams": [],
       "is_abstract": false,
       "docstring": "Full-sized SD card socket"
+    },
+    {
+      "name": "",
+      "type": "SelectorArea",
+      "superClasses": [
+        "PartsTablePart"
+      ],
+      "ports": [],
+      "argParams": [
+        {
+          "name": "footprint_area",
+          "type": "range",
+          "default_value": [
+            null,
+            null
+          ],
+          "docstring": null
+        }
+      ],
+      "is_abstract": true,
+      "docstring": "A base mixin that defines a footprint_area range specification for blocks that automatically select parts.\nProvides no implementation, only defines the specification parameter.\n\nSome common areas for SMD parts:\n01005   R=0.72    C=0.72    D=0.72\n0201    R=0.98    C=0.98    D=0.98\n0402    R=1.7484  C=1.6744  D=1.7484\n0603    R=4.3216  C=4.3216  D=4.3216\n0805    R=6.384   C=6.664   D=6.384\n1206    R=10.2144 C=10.58   D=10.2144\n1812    R=23.01   C=23.4    D=23.01\n2512    R=29.3376           D=29.3376"
+    },
+    {
+      "name": "",
+      "type": "SelectorFootprint",
+      "superClasses": [
+        "PartsTablePart"
+      ],
+      "ports": [],
+      "argParams": [
+        {
+          "name": "footprint_spec",
+          "type": "str",
+          "default_value": "",
+          "docstring": null
+        }
+      ],
+      "is_abstract": true,
+      "docstring": "Mixin that allows a specified footprint, for Blocks that automatically select a part."
     },
     {
       "name": "",
@@ -17670,19 +19068,104 @@
     },
     {
       "name": "",
-      "type": "SmdStandardPackage",
-      "superClasses": [],
-      "ports": [],
-      "argParams": [
+      "type": "SmaConnector",
+      "superClasses": [
+        "RfConnector",
+        "Connector"
+      ],
+      "ports": [
         {
-          "name": "smd_min_package",
-          "type": "str",
-          "default_value": "",
+          "name": "sig",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
           "docstring": null
         }
       ],
+      "argParams": [],
       "is_abstract": true,
-      "docstring": "A base mixin for any device that can generate into a standard SMT package, the 0402/0603/0805/etc series.\nThis provides a parameter that can be globally set to specify a minimum package size.\nDevices may generate into nonstandard packages, those are not affected.\nIf this parameter is empty, no minimums are applied.\n\nInheriting this class does not provide any behavior, it only adds the minimum parameter.\n\nFor non-generators classes that inherit this, the minimum size should be used as an assertion."
+      "docstring": "Base class for a SMA coax connector."
+    },
+    {
+      "name": "",
+      "type": "SmaFConnector",
+      "superClasses": [
+        "SmaConnector",
+        "RfConnector",
+        "Connector"
+      ],
+      "ports": [
+        {
+          "name": "sig",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": true,
+      "docstring": "Base class for a SMA F connector, socket with external threads.\nTypically used for an antenna connector for sub-2.4GHz applications; 2.4GHz uses RP-SMA."
+    },
+    {
+      "name": "",
+      "type": "SmaMConnector",
+      "superClasses": [
+        "SmaConnector",
+        "RfConnector",
+        "Connector"
+      ],
+      "ports": [
+        {
+          "name": "sig",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": true,
+      "docstring": "Base class for a SMA M connector, pin with internal threads.\nTypically used on the antenna itself."
     },
     {
       "name": "",
@@ -19317,6 +20800,266 @@
     },
     {
       "name": "",
+      "type": "Sx1262",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "reset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "spi",
+          "type": "SpiPeripheral",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "cs",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "irq",
+          "type": "DigitalBidir",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "busy",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "Sub-GHZ (150-960MHz) RF transceiver with LoRa support, with discrete RF frontend and parameterized by frequency.\nUp to 62.5kb/s in LoRa mode and 300kb/s in FSK mode.\nTODO: RF frequency parameterization"
+    },
+    {
+      "name": "",
+      "type": "Sx1262_Device",
+      "superClasses": [],
+      "ports": [
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vbat",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vbat_io",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vreg",
+          "type": "VoltageSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "dcc_sw",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "xtal",
+          "type": "CrystalDriver",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "rfi_p",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "rfi_n",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "rfo",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "vr_pa",
+          "type": "VoltageSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "dio1",
+          "type": "DigitalBidir",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "dio2",
+          "type": "DigitalBidir",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "dio3",
+          "type": "DigitalBidir",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "spi",
+          "type": "SpiPeripheral",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "nss",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "busy",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "nreset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": null
+    },
+    {
+      "name": "",
       "type": "TagConnect",
       "superClasses": [
         "FootprintPassiveConnector",
@@ -19512,6 +21255,60 @@
       "argParams": [],
       "is_abstract": false,
       "docstring": null
+    },
+    {
+      "name": "",
+      "type": "Tlv757p",
+      "superClasses": [
+        "LinearRegulator",
+        "VoltageRegulator",
+        "PowerConditioner"
+      ],
+      "ports": [
+        {
+          "name": "pwr_in",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr_out",
+          "type": "VoltageSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "reset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "1A LDO regulator in SOT-23-5 with 1.45-5.5Vin and 0.5-5Vout\nBy default, this models worst-case dropout at 1A, consult datasheet for lower dropouts for lower currents\nWhile it can electrically handle 1A, beware of thermal limits. Shuts down at 155C, Rja for SOT-23-5 of 100C/W"
     },
     {
       "name": "",
@@ -20116,7 +21913,7 @@
         }
       ],
       "argParams": [],
-      "is_abstract": false,
+      "is_abstract": true,
       "docstring": "Base class for a U.FL / IPEX / UMCC connector, miniature RF connector."
     },
     {
@@ -20497,7 +22294,6 @@
       "name": "",
       "type": "Vl53l0x",
       "superClasses": [
-        "Vl53l0xBase",
         "DistanceSensor",
         "Sensor"
       ],
@@ -20625,72 +22421,10 @@
     },
     {
       "name": "",
-      "type": "Vl53l0xBase",
-      "superClasses": [
-        "DistanceSensor",
-        "Sensor"
-      ],
-      "ports": [
-        {
-          "name": "reset",
-          "type": "DigitalSink",
-          "is_array": false,
-          "hint_position": "left",
-          "hint_signal_direction": "sink",
-          "hint_array_direction": null,
-          "required": false,
-          "docstring": null
-        },
-        {
-          "name": "gnd",
-          "type": "Ground",
-          "is_array": false,
-          "hint_position": null,
-          "hint_signal_direction": "bidir",
-          "hint_array_direction": null,
-          "required": true,
-          "docstring": null
-        },
-        {
-          "name": "pwr",
-          "type": "VoltageSink",
-          "is_array": false,
-          "hint_position": "up",
-          "hint_signal_direction": "sink",
-          "hint_array_direction": null,
-          "required": true,
-          "docstring": null
-        },
-        {
-          "name": "i2c",
-          "type": "I2cTarget",
-          "is_array": false,
-          "hint_position": "left",
-          "hint_signal_direction": "sink",
-          "hint_array_direction": null,
-          "required": true,
-          "docstring": null
-        },
-        {
-          "name": "int",
-          "type": "DigitalSingleSource",
-          "is_array": false,
-          "hint_position": "right",
-          "hint_signal_direction": "source",
-          "hint_array_direction": null,
-          "required": false,
-          "docstring": "Interrupt output for new data available"
-        }
-      ],
-      "argParams": [],
-      "is_abstract": true,
-      "docstring": "Abstract base class for VL53L0x devices"
-    },
-    {
-      "name": "",
       "type": "Vl53l0xConnector",
       "superClasses": [
-        "Vl53l0xBase",
+        "Vl53l0x",
+        "WrapperFootprintBlock",
         "DistanceSensor",
         "Sensor"
       ],
@@ -20748,7 +22482,7 @@
       ],
       "argParams": [],
       "is_abstract": false,
-      "docstring": "Connector to an external VL53L0X breakout board.\nUses the pinout from the Adafruit product: https://www.adafruit.com/product/3317\nThis has an onboard 2.8v regulator, but thankfully the IO tolerance is not referenced to Vdd"
+      "docstring": "Connector to an external VL53L0X breakout board.\nUses the pinout from the Adafruit product: https://www.adafruit.com/product/3317\nThis has an onboard 2.8v regulator, but thankfully the IO tolerance is not referenced to Vdd\n\nTODO: not completely correct that this should extend the application circuit"
     },
     {
       "name": "",
@@ -21240,6 +22974,15 @@
       "argParams": [],
       "is_abstract": false,
       "docstring": "Multi-device-compatible driver circuitry based on the Waveshare E-Paper Driver HAT\nhttps://www.waveshare.com/wiki/E-Paper_Driver_HAT\nexcluding the \"clever\" reset circuit"
+    },
+    {
+      "name": "",
+      "type": "WrapperFootprintBlock",
+      "superClasses": [],
+      "ports": [],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "Block that has a footprint and optional internal contents, but the netlister ignores internal components.\nUseful for, for example, a breakout board where the modelling details are provided by internal chip blocks,\nbut needs to show up as only a carrier board footprint.\nEXPERIMENTAL - API SUBJECT TO CHANGE."
     },
     {
       "name": "",
@@ -22586,6 +24329,24 @@
             "name": "RfConnector",
             "children": [
               {
+                "name": "SmaConnector",
+                "children": [
+                  {
+                    "name": "SmaFConnector",
+                    "children": [
+                      {
+                        "name": "Amphenol901143",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "name": "SmaMConnector",
+                    "children": []
+                  }
+                ]
+              },
+              {
                 "name": "UflConnector",
                 "children": [
                   {
@@ -22627,6 +24388,14 @@
             ]
           }
         ]
+      },
+      {
+        "name": "DifferentialLLowPassFilter",
+        "children": []
+      },
+      {
+        "name": "DifferentialLcLowpassFilter",
+        "children": []
       },
       {
         "name": "DiscreteApplication",
@@ -22694,6 +24463,10 @@
           {
             "name": "AnalogFilter",
             "children": [
+              {
+                "name": "LLowPassFilterWith2HNotch",
+                "children": []
+              },
               {
                 "name": "LowPassRc",
                 "children": []
@@ -22968,11 +24741,19 @@
               {
                 "name": "JlcAntenna",
                 "children": []
+              },
+              {
+                "name": "RfConnectorAntenna",
+                "children": []
               }
             ]
           },
           {
             "name": "Apx803s",
+            "children": []
+          },
+          {
+            "name": "BidirectionaLevelShifter",
             "children": []
           },
           {
@@ -23259,6 +25040,97 @@
         ]
       },
       {
+        "name": "NfcAntenna",
+        "children": []
+      },
+      {
+        "name": "NfcAntennaDampening",
+        "children": []
+      },
+      {
+        "name": "PartsTablePart",
+        "children": [
+          {
+            "name": "JlcAntenna",
+            "children": []
+          },
+          {
+            "name": "JlcBaseFet",
+            "children": []
+          },
+          {
+            "name": "JlcOscillator",
+            "children": []
+          },
+          {
+            "name": "JlcPartsBase",
+            "children": []
+          },
+          {
+            "name": "JlcResistorArray",
+            "children": []
+          },
+          {
+            "name": "SelectorArea",
+            "children": [
+              {
+                "name": "JlcAntenna",
+                "children": []
+              },
+              {
+                "name": "JlcBaseFet",
+                "children": []
+              },
+              {
+                "name": "JlcOscillator",
+                "children": []
+              },
+              {
+                "name": "JlcPartsBase",
+                "children": []
+              },
+              {
+                "name": "JlcResistorArray",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "SelectorFootprint",
+            "children": [
+              {
+                "name": "JlcAntenna",
+                "children": []
+              },
+              {
+                "name": "JlcBaseFet",
+                "children": []
+              },
+              {
+                "name": "JlcOscillator",
+                "children": []
+              },
+              {
+                "name": "JlcPartsBase",
+                "children": []
+              },
+              {
+                "name": "JlcResistorArray",
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Pn7160RxFilter",
+        "children": []
+      },
+      {
+        "name": "Pn7160_Device",
+        "children": []
+      },
+      {
         "name": "PowerConditioner",
         "children": [
           {
@@ -23379,6 +25251,10 @@
                     "children": []
                   },
                   {
+                    "name": "Tlv757p",
+                    "children": []
+                  },
+                  {
                     "name": "VoltageReference",
                     "children": [
                       {
@@ -23482,6 +25358,10 @@
                     ]
                   }
                 ]
+              },
+              {
+                "name": "Tlv757p",
+                "children": []
               },
               {
                 "name": "Tps561201",
@@ -23957,6 +25837,10 @@
                 "children": []
               },
               {
+                "name": "Ina219",
+                "children": []
+              },
+              {
                 "name": "OpampCurrentSensor",
                 "children": []
               }
@@ -23966,21 +25850,17 @@
             "name": "DistanceSensor",
             "children": [
               {
-                "name": "Vl53l0xArray",
-                "children": []
-              },
-              {
-                "name": "Vl53l0xBase",
+                "name": "Vl53l0x",
                 "children": [
-                  {
-                    "name": "Vl53l0x",
-                    "children": []
-                  },
                   {
                     "name": "Vl53l0xConnector",
                     "children": []
                   }
                 ]
+              },
+              {
+                "name": "Vl53l0xArray",
+                "children": []
               }
             ]
           },
@@ -24046,6 +25926,10 @@
             ]
           },
           {
+            "name": "FlirLepton",
+            "children": []
+          },
+          {
             "name": "Gyroscope",
             "children": [
               {
@@ -24088,7 +25972,7 @@
         ]
       },
       {
-        "name": "SmdStandardPackage",
+        "name": "Sx1262_Device",
         "children": []
       },
       {
@@ -24158,6 +26042,10 @@
                 "children": []
               },
               {
+                "name": "CanDiffTestPoint",
+                "children": []
+              },
+              {
                 "name": "DigitalArrayTestPoint",
                 "children": []
               },
@@ -24190,6 +26078,19 @@
                 "children": []
               }
             ]
+          }
+        ]
+      },
+      {
+        "name": "WrapperFootprintBlock",
+        "children": [
+          {
+            "name": "PololuA4988",
+            "children": []
+          },
+          {
+            "name": "Vl53l0xConnector",
+            "children": []
           }
         ]
       }
