@@ -51,7 +51,7 @@ function SwitchMatrix_2_3_SwitchMatrix(xy, colSpacing=1, rowSpacing=1, diodeOffs
 
       diodePos = [buttonPos[0] + diodeOffset[0], buttonPos[1] + diodeOffset[1]]
       obj[`d[${xIndex},${yIndex}]`] = diode = board.add(
-        D_SMA,
+        D_SOD_323,
         {
           translate: diodePos, rotate: 90,
           id: `SwitchMatrix_d_${xIndex}_${yIndex}_`
