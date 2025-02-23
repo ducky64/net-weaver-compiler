@@ -1,1 +1,1509 @@
+{
+  "nets": [
+    [
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 6,
+        "name": "_2keyhRvJ",
+        "portName": "gnd"
       },
+      {
+        "nodeId": "_7LxBvLsb",
+        "portIdx": 1,
+        "name": "_7LxBvLsb",
+        "portName": "gnd"
+      },
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 0,
+        "name": "_wyhoOPdu",
+        "portName": "gnd"
+      },
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 0,
+        "name": "_lscqtIoy",
+        "portName": "gnd"
+      },
+      {
+        "nodeId": "_jgiqw7e8",
+        "portIdx": 1,
+        "name": "_jgiqw7e8",
+        "portName": "gnd"
+      },
+      {
+        "nodeId": "_PYsyym5s",
+        "portIdx": 0,
+        "name": "_PYsyym5s",
+        "portName": "gnd"
+      }
+    ],
+    [
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 1,
+        "name": "_wyhoOPdu",
+        "portName": "pwr"
+      },
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 1,
+        "name": "_lscqtIoy",
+        "portName": "pwr"
+      },
+      {
+        "nodeId": "_7LxBvLsb",
+        "portIdx": 0,
+        "name": "_7LxBvLsb",
+        "portName": "pwr"
+      },
+      {
+        "nodeId": "_jgiqw7e8",
+        "portIdx": 2,
+        "name": "_jgiqw7e8",
+        "portName": "vbus"
+      }
+    ],
+    [
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 2,
+        "name": "_lscqtIoy",
+        "portName": "pwr_logic"
+      },
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 2,
+        "name": "_wyhoOPdu",
+        "portName": "pwr_logic"
+      },
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 9,
+        "name": "_2keyhRvJ",
+        "portName": "pwr_out"
+      },
+      {
+        "nodeId": "_jgiqw7e8",
+        "portIdx": 0,
+        "name": "_jgiqw7e8",
+        "portName": "pwr"
+      }
+    ],
+    [
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 3,
+        "name": "_wyhoOPdu",
+        "portName": "step"
+      },
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 11,
+        "name": "_2keyhRvJ",
+        "portName": "gpio_11"
+      }
+    ],
+    [
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 3,
+        "name": "_lscqtIoy",
+        "portName": "step"
+      },
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 12,
+        "name": "_2keyhRvJ",
+        "portName": "gpio_12"
+      }
+    ],
+    [
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 13,
+        "name": "_2keyhRvJ",
+        "portName": "gpio_13"
+      },
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 4,
+        "name": "_lscqtIoy",
+        "portName": "dir"
+      }
+    ],
+    [
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 14,
+        "name": "_2keyhRvJ",
+        "portName": "gpio_14"
+      },
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 4,
+        "name": "_wyhoOPdu",
+        "portName": "dir"
+      }
+    ],
+    [
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 5,
+        "name": "_wyhoOPdu",
+        "portName": "enable"
+      },
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 15,
+        "name": "_2keyhRvJ",
+        "portName": "gpio_15"
+      },
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 5,
+        "name": "_lscqtIoy",
+        "portName": "enable"
+      },
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 16,
+        "name": "_2keyhRvJ",
+        "portName": "gpio_16"
+      }
+    ],
+    [
+      {
+        "nodeId": "_PYsyym5s",
+        "portIdx": 1,
+        "name": "_PYsyym5s",
+        "portName": "out"
+      },
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 17,
+        "name": "_2keyhRvJ",
+        "portName": "gpio_17"
+      }
+    ],
+    [
+      {
+        "nodeId": "_jgiqw7e8",
+        "portIdx": 3,
+        "name": "_jgiqw7e8",
+        "portName": "cc"
+      },
+      {
+        "nodeId": "_7LxBvLsb",
+        "portIdx": 3,
+        "name": "_7LxBvLsb",
+        "portName": "cc"
+      }
+    ],
+    [
+      {
+        "nodeId": "_jgiqw7e8",
+        "portIdx": 4,
+        "name": "_jgiqw7e8",
+        "portName": "i2c"
+      },
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 18,
+        "name": "_2keyhRvJ",
+        "portName": "i2c_18"
+      }
+    ],
+    [
+      {
+        "nodeId": "_jgiqw7e8",
+        "portIdx": 5,
+        "name": "_jgiqw7e8",
+        "portName": "int"
+      },
+      {
+        "nodeId": "_2keyhRvJ",
+        "portIdx": 19,
+        "name": "_2keyhRvJ",
+        "portName": "gpio_19"
+      }
+    ],
+    [
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 8,
+        "name": "_lscqtIoy",
+        "portName": "out1a"
+      },
+      {
+        "nodeId": "_5WlvXoNt",
+        "portIdx": 0,
+        "name": "_5WlvXoNt",
+        "portName": "port_0"
+      }
+    ],
+    [
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 9,
+        "name": "_lscqtIoy",
+        "portName": "out1b"
+      },
+      {
+        "nodeId": "_5WlvXoNt",
+        "portIdx": 1,
+        "name": "_5WlvXoNt",
+        "portName": "port_1"
+      }
+    ],
+    [
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 10,
+        "name": "_lscqtIoy",
+        "portName": "out2a"
+      },
+      {
+        "nodeId": "_5WlvXoNt",
+        "portIdx": 2,
+        "name": "_5WlvXoNt",
+        "portName": "port_2"
+      }
+    ],
+    [
+      {
+        "nodeId": "_lscqtIoy",
+        "portIdx": 11,
+        "name": "_lscqtIoy",
+        "portName": "out2b"
+      },
+      {
+        "nodeId": "_5WlvXoNt",
+        "portIdx": 3,
+        "name": "_5WlvXoNt",
+        "portName": "port_3"
+      }
+    ],
+    [
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 8,
+        "name": "_wyhoOPdu",
+        "portName": "out1a"
+      },
+      {
+        "nodeId": "_KVQLZoP0",
+        "portIdx": 0,
+        "name": "_KVQLZoP0",
+        "portName": "port_0"
+      }
+    ],
+    [
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 9,
+        "name": "_wyhoOPdu",
+        "portName": "out1b"
+      },
+      {
+        "nodeId": "_KVQLZoP0",
+        "portIdx": 1,
+        "name": "_KVQLZoP0",
+        "portName": "port_1"
+      }
+    ],
+    [
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 10,
+        "name": "_wyhoOPdu",
+        "portName": "out2a"
+      },
+      {
+        "nodeId": "_KVQLZoP0",
+        "portIdx": 2,
+        "name": "_KVQLZoP0",
+        "portName": "port_2"
+      }
+    ],
+    [
+      {
+        "nodeId": "_wyhoOPdu",
+        "portIdx": 11,
+        "name": "_wyhoOPdu",
+        "portName": "out2b"
+      },
+      {
+        "nodeId": "_KVQLZoP0",
+        "portIdx": 3,
+        "name": "_KVQLZoP0",
+        "portName": "port_3"
+      }
+    ]
+  ],
+  "graph": {
+    "nodes": {
+      "_2keyhRvJ": {
+        "data": {
+          "name": "Xiao_Rp2040",
+          "type": "Xiao_Rp2040",
+          "superClasses": [
+            "IoController",
+            "ProgrammableController"
+          ],
+          "ports": [
+            {
+              "name": "gpio",
+              "leftRightUpDown": "left",
+              "type": "DigitalBidir",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 0
+            },
+            {
+              "name": "adc",
+              "leftRightUpDown": "left",
+              "type": "AnalogSink",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 1
+            },
+            {
+              "name": "spi",
+              "leftRightUpDown": "right",
+              "type": "SpiController",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 2
+            },
+            {
+              "name": "i2c",
+              "leftRightUpDown": "right",
+              "type": "I2cController",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 3
+            },
+            {
+              "name": "uart",
+              "leftRightUpDown": "left",
+              "type": "UartPort",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 4
+            },
+            {
+              "name": "usb",
+              "leftRightUpDown": "left",
+              "type": "UsbDevicePort",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 5
+            },
+            {
+              "name": "gnd",
+              "leftRightUpDown": "left",
+              "type": "Ground",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 6
+            },
+            {
+              "name": "pwr",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 7
+            },
+            {
+              "name": "i2c_target",
+              "leftRightUpDown": "left",
+              "type": "I2cTarget",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 8
+            },
+            {
+              "name": "pwr_out",
+              "leftRightUpDown": "right",
+              "type": "VoltageSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 9
+            },
+            {
+              "name": "vusb_out",
+              "leftRightUpDown": "right",
+              "type": "VoltageSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 10
+            },
+            {
+              "name": "gpio_11",
+              "array": false,
+              "idx": 11,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            },
+            {
+              "name": "gpio_12",
+              "array": false,
+              "idx": 12,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            },
+            {
+              "name": "gpio_13",
+              "array": false,
+              "idx": 13,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            },
+            {
+              "name": "gpio_14",
+              "array": false,
+              "idx": 14,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            },
+            {
+              "name": "gpio_15",
+              "array": false,
+              "idx": 15,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            },
+            {
+              "name": "gpio_16",
+              "array": false,
+              "idx": 16,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            },
+            {
+              "name": "gpio_17",
+              "array": false,
+              "idx": 17,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            },
+            {
+              "name": "i2c_18",
+              "array": false,
+              "idx": 18,
+              "leftRightUpDown": "right",
+              "srcSinkBi": "bi",
+              "type": "I2cController",
+              "elementOf": 3
+            },
+            {
+              "name": "gpio_19",
+              "array": false,
+              "idx": 19,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            }
+          ],
+          "argParams": []
+        },
+        "ports": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "id": "_2keyhRvJ"
+      },
+      "_wyhoOPdu": {
+        "data": {
+          "name": "A4988_1",
+          "type": "A4988",
+          "superClasses": [
+            "BrushedMotorDriver",
+            "MotorDriver",
+            "PowerSwitch"
+          ],
+          "ports": [
+            {
+              "name": "gnd",
+              "leftRightUpDown": "left",
+              "type": "Ground",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 0
+            },
+            {
+              "name": "pwr",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 1
+            },
+            {
+              "name": "pwr_logic",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 2
+            },
+            {
+              "name": "step",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 3
+            },
+            {
+              "name": "dir",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 4
+            },
+            {
+              "name": "enable",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 5
+            },
+            {
+              "name": "reset",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 6
+            },
+            {
+              "name": "sleep",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 7
+            },
+            {
+              "name": "out1a",
+              "leftRightUpDown": "right",
+              "type": "DigitalSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 8
+            },
+            {
+              "name": "out1b",
+              "leftRightUpDown": "right",
+              "type": "DigitalSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 9
+            },
+            {
+              "name": "out2a",
+              "leftRightUpDown": "right",
+              "type": "DigitalSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 10
+            },
+            {
+              "name": "out2b",
+              "leftRightUpDown": "right",
+              "type": "DigitalSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 11
+            }
+          ],
+          "argParams": [
+            {
+              "name": "step_resolution",
+              "type": "int",
+              "default_value": 16,
+              "docstring": "microstepping resolution (1, 2, 4, 8, or 16)",
+              "value": 16
+            },
+            {
+              "name": "itrip",
+              "type": "range",
+              "default_value": [
+                0.85,
+                1.15
+              ],
+              "docstring": "maximum (trip) current across motor windings",
+              "value": [
+                0.85,
+                1.15
+              ]
+            },
+            {
+              "name": "itrip_vref",
+              "type": "range",
+              "default_value": [
+                0.23,
+                0.27
+              ],
+              "docstring": "voltage reference for Isense trip, not counting the 8x on Vref",
+              "value": [
+                0.23,
+                0.27
+              ]
+            }
+          ]
+        },
+        "ports": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "id": "_wyhoOPdu"
+      },
+      "_lscqtIoy": {
+        "data": {
+          "name": "A4988_2",
+          "type": "A4988",
+          "superClasses": [
+            "BrushedMotorDriver",
+            "MotorDriver",
+            "PowerSwitch"
+          ],
+          "ports": [
+            {
+              "name": "gnd",
+              "leftRightUpDown": "left",
+              "type": "Ground",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 0
+            },
+            {
+              "name": "pwr",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 1
+            },
+            {
+              "name": "pwr_logic",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 2
+            },
+            {
+              "name": "step",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 3
+            },
+            {
+              "name": "dir",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 4
+            },
+            {
+              "name": "enable",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 5
+            },
+            {
+              "name": "reset",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 6
+            },
+            {
+              "name": "sleep",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 7
+            },
+            {
+              "name": "out1a",
+              "leftRightUpDown": "right",
+              "type": "DigitalSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 8
+            },
+            {
+              "name": "out1b",
+              "leftRightUpDown": "right",
+              "type": "DigitalSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 9
+            },
+            {
+              "name": "out2a",
+              "leftRightUpDown": "right",
+              "type": "DigitalSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 10
+            },
+            {
+              "name": "out2b",
+              "leftRightUpDown": "right",
+              "type": "DigitalSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 11
+            }
+          ],
+          "argParams": [
+            {
+              "name": "step_resolution",
+              "type": "int",
+              "default_value": 16,
+              "docstring": "microstepping resolution (1, 2, 4, 8, or 16)",
+              "value": 16
+            },
+            {
+              "name": "itrip",
+              "type": "range",
+              "default_value": [
+                0.85,
+                1.15
+              ],
+              "docstring": "maximum (trip) current across motor windings",
+              "value": [
+                0.85,
+                1.15
+              ]
+            },
+            {
+              "name": "itrip_vref",
+              "type": "range",
+              "default_value": [
+                0.23,
+                0.27
+              ],
+              "docstring": "voltage reference for Isense trip, not counting the 8x on Vref",
+              "value": [
+                0.23,
+                0.27
+              ]
+            }
+          ]
+        },
+        "ports": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "id": "_lscqtIoy"
+      },
+      "_7LxBvLsb": {
+        "data": {
+          "name": "UsbCReceptacle",
+          "type": "UsbCReceptacle",
+          "superClasses": [
+            "UsbDeviceConnector",
+            "Connector",
+            "PowerSource"
+          ],
+          "ports": [
+            {
+              "name": "pwr",
+              "leftRightUpDown": "right",
+              "type": "VoltageSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 0
+            },
+            {
+              "name": "gnd",
+              "leftRightUpDown": "left",
+              "type": "Ground",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 1
+            },
+            {
+              "name": "usb",
+              "leftRightUpDown": "right",
+              "type": "UsbHostPort",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 2
+            },
+            {
+              "name": "cc",
+              "leftRightUpDown": "left",
+              "type": "UsbCcPort",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 3
+            }
+          ],
+          "argParams": [
+            {
+              "name": "voltage_out",
+              "type": "range",
+              "default_value": [
+                4.75,
+                5.25
+              ],
+              "docstring": null,
+              "value": [
+                11.4,
+                12.6
+              ]
+            },
+            {
+              "name": "current_limits",
+              "type": "range",
+              "default_value": [
+                0,
+                0.5
+              ],
+              "docstring": null,
+              "value": [
+                0,
+                3
+              ]
+            }
+          ]
+        },
+        "ports": [
+          [],
+          [],
+          [],
+          []
+        ],
+        "id": "_7LxBvLsb"
+      },
+      "_jgiqw7e8": {
+        "data": {
+          "name": "Fusb302b",
+          "type": "Fusb302b",
+          "superClasses": [
+            "Interface"
+          ],
+          "ports": [
+            {
+              "name": "pwr",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 0
+            },
+            {
+              "name": "gnd",
+              "leftRightUpDown": "left",
+              "type": "Ground",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 1
+            },
+            {
+              "name": "vbus",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 2
+            },
+            {
+              "name": "cc",
+              "leftRightUpDown": "left",
+              "type": "UsbCcPort",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 3
+            },
+            {
+              "name": "i2c",
+              "leftRightUpDown": "left",
+              "type": "I2cTarget",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 4
+            },
+            {
+              "name": "int",
+              "leftRightUpDown": "right",
+              "type": "DigitalSingleSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 5
+            }
+          ],
+          "argParams": []
+        },
+        "ports": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "id": "_jgiqw7e8"
+      },
+      "_PYsyym5s": {
+        "data": {
+          "name": "DigitalSwitch",
+          "type": "DigitalSwitch",
+          "superClasses": [
+            "HumanInterface"
+          ],
+          "ports": [
+            {
+              "name": "gnd",
+              "leftRightUpDown": "left",
+              "type": "Ground",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 0
+            },
+            {
+              "name": "out",
+              "leftRightUpDown": "right",
+              "type": "DigitalSingleSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 1
+            }
+          ],
+          "argParams": []
+        },
+        "ports": [
+          [],
+          []
+        ],
+        "id": "_PYsyym5s"
+      },
+      "_5WlvXoNt": {
+        "data": {
+          "name": "PinHeader254Horizontal",
+          "type": "PinHeader254Horizontal",
+          "superClasses": [
+            "PinHeader254",
+            "FootprintPassiveConnector",
+            "PassiveConnector"
+          ],
+          "ports": [
+            {
+              "array": false,
+              "idx": 0,
+              "leftRightUpDown": "left",
+              "name": "port_0",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            },
+            {
+              "array": false,
+              "idx": 1,
+              "leftRightUpDown": "left",
+              "name": "port_1",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            },
+            {
+              "array": false,
+              "idx": 2,
+              "leftRightUpDown": "left",
+              "name": "port_2",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            },
+            {
+              "array": false,
+              "idx": 3,
+              "leftRightUpDown": "left",
+              "name": "port_3",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            }
+          ],
+          "argParams": [
+            {
+              "name": "length",
+              "type": "int",
+              "default_value": 0,
+              "docstring": null,
+              "value": 4
+            }
+          ]
+        },
+        "ports": [
+          [],
+          [],
+          [],
+          []
+        ],
+        "id": "_5WlvXoNt"
+      },
+      "_KVQLZoP0": {
+        "data": {
+          "name": "PinHeader254Horizontal_0",
+          "type": "PinHeader254Horizontal",
+          "superClasses": [
+            "PinHeader254",
+            "FootprintPassiveConnector",
+            "PassiveConnector"
+          ],
+          "ports": [
+            {
+              "array": false,
+              "idx": 0,
+              "leftRightUpDown": "left",
+              "name": "port_0",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            },
+            {
+              "array": false,
+              "idx": 1,
+              "leftRightUpDown": "left",
+              "name": "port_1",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            },
+            {
+              "array": false,
+              "idx": 2,
+              "leftRightUpDown": "left",
+              "name": "port_2",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            },
+            {
+              "array": false,
+              "idx": 3,
+              "leftRightUpDown": "left",
+              "name": "port_3",
+              "srcSinkBi": "bi",
+              "type": "Passive"
+            }
+          ],
+          "argParams": [
+            {
+              "name": "length",
+              "type": "int",
+              "default_value": 0,
+              "docstring": null,
+              "value": 4
+            }
+          ]
+        },
+        "ports": [
+          [],
+          [],
+          [],
+          []
+        ],
+        "id": "_KVQLZoP0"
+      }
+    },
+    "edges": {}
+  },
+  "graphUIData": {
+    "_2keyhRvJ": {
+      "x": -97.18294270645897,
+      "y": 93.03226653949898
+    },
+    "_wyhoOPdu": {
+      "x": 294.9949755558132,
+      "y": 317.1287324025718
+    },
+    "_lscqtIoy": {
+      "x": 299.8385794955459,
+      "y": 598.795672018636
+    },
+    "_7LxBvLsb": {
+      "x": 606.184446573901,
+      "y": 121.55494639437583
+    },
+    "_jgiqw7e8": {
+      "x": 291.1925484290861,
+      "y": 138.42187499999966
+    },
+    "_PYsyym5s": {
+      "x": 287.61039153949906,
+      "y": 52.450109649912015
+    },
+    "_5WlvXoNt": {
+      "x": 619.1779550518113,
+      "y": 598.5947302308846
+    },
+    "_KVQLZoP0": {
+      "x": 644.1544995426731,
+      "y": 317.4235109338479
+    }
+  },
+  "labels": {
+    "ZAc2b3fM": {
+      "labelName": "gnd",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 6
+    },
+    "S44mux2R": {
+      "labelName": "gnd",
+      "nodeId": "_7LxBvLsb",
+      "portIdx": 1
+    },
+    "wCI1PdRG": {
+      "labelName": "gnd",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 0
+    },
+    "nye6e07R": {
+      "labelName": "gnd",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 0
+    },
+    "VQBK4jHX": {
+      "labelName": "_12_volts",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 1
+    },
+    "2pyKEK00": {
+      "labelName": "_12_volts",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 1
+    },
+    "JyrdNscy": {
+      "labelName": "pwr_logic",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 2
+    },
+    "5CZ22JMK": {
+      "labelName": "pwr_logic",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 2
+    },
+    "zfn7Ys0m": {
+      "labelName": "step2",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 3
+    },
+    "qZekXATu": {
+      "labelName": "step2",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 11
+    },
+    "DsblHadc": {
+      "labelName": "step1",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 3
+    },
+    "cPLFbgwI": {
+      "labelName": "step1",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 12
+    },
+    "CB5ioMXD": {
+      "labelName": "dir1",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 13
+    },
+    "6OxBkId0": {
+      "labelName": "dir1",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 4
+    },
+    "HI5bUjBG": {
+      "labelName": "dir2",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 14
+    },
+    "R6VzScvw": {
+      "labelName": "dir2",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 4
+    },
+    "Dz6r8r7k": {
+      "labelName": "enable",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 5
+    },
+    "tAATP4CY": {
+      "labelName": "enable",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 15
+    },
+    "D3r0iCD0": {
+      "labelName": "enable",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 5
+    },
+    "fX8znDsj": {
+      "labelName": "enable",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 16
+    },
+    "0EEYkQWY": {
+      "labelName": "switch",
+      "nodeId": "_PYsyym5s",
+      "portIdx": 1
+    },
+    "2NkiKWYS": {
+      "labelName": "switch",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 17
+    },
+    "IAasba5W": {
+      "labelName": "gnd",
+      "nodeId": "_jgiqw7e8",
+      "portIdx": 1
+    },
+    "J847gWsY": {
+      "labelName": "gnd",
+      "nodeId": "_PYsyym5s",
+      "portIdx": 0
+    },
+    "JjSSDhva": {
+      "labelName": "pwr_logic",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 9
+    },
+    "rumRfutZ": {
+      "labelName": "pwr_logic",
+      "nodeId": "_jgiqw7e8",
+      "portIdx": 0
+    },
+    "yMeb0iib": {
+      "labelName": "_12_volts",
+      "nodeId": "_7LxBvLsb",
+      "portIdx": 0
+    },
+    "Ox9ch8KV": {
+      "labelName": "_12_volts",
+      "nodeId": "_jgiqw7e8",
+      "portIdx": 2
+    },
+    "XUujdBm3": {
+      "labelName": "cc",
+      "nodeId": "_jgiqw7e8",
+      "portIdx": 3
+    },
+    "NsMSKfGI": {
+      "labelName": "cc",
+      "nodeId": "_7LxBvLsb",
+      "portIdx": 3
+    },
+    "NDrVOzFa": {
+      "labelName": "i2c",
+      "nodeId": "_jgiqw7e8",
+      "portIdx": 4
+    },
+    "M415La5u": {
+      "labelName": "i2c",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 18
+    },
+    "2GkOgfqN": {
+      "labelName": "pd_int",
+      "nodeId": "_jgiqw7e8",
+      "portIdx": 5
+    },
+    "fsi4zh1C": {
+      "labelName": "pd_int",
+      "nodeId": "_2keyhRvJ",
+      "portIdx": 19
+    },
+    "ChemTXNn": {
+      "labelName": "out1a",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 8
+    },
+    "QZgcCTyS": {
+      "labelName": "out1a",
+      "nodeId": "_5WlvXoNt",
+      "portIdx": 0
+    },
+    "w9OkcxpF": {
+      "labelName": "out1b",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 9
+    },
+    "nHu1b1Lb": {
+      "labelName": "out1b",
+      "nodeId": "_5WlvXoNt",
+      "portIdx": 1
+    },
+    "E6foiCGm": {
+      "labelName": "out2a",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 10
+    },
+    "mqGepUKM": {
+      "labelName": "out2a",
+      "nodeId": "_5WlvXoNt",
+      "portIdx": 2
+    },
+    "EaRH1y9S": {
+      "labelName": "out2b",
+      "nodeId": "_lscqtIoy",
+      "portIdx": 11
+    },
+    "3yjH9Tbs": {
+      "labelName": "out2b",
+      "nodeId": "_5WlvXoNt",
+      "portIdx": 3
+    },
+    "HhEw38Ql": {
+      "labelName": "out1a_0",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 8
+    },
+    "GiPNQXDG": {
+      "labelName": "out1a_0",
+      "nodeId": "_KVQLZoP0",
+      "portIdx": 0
+    },
+    "248gGXt6": {
+      "labelName": "out1b_0",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 9
+    },
+    "KapxIjfv": {
+      "labelName": "out1b_0",
+      "nodeId": "_KVQLZoP0",
+      "portIdx": 1
+    },
+    "aptK3QxI": {
+      "labelName": "out2a_0",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 10
+    },
+    "QQ5LLAe0": {
+      "labelName": "out2a_0",
+      "nodeId": "_KVQLZoP0",
+      "portIdx": 2
+    },
+    "gQLBNTV0": {
+      "labelName": "out2b_0",
+      "nodeId": "_wyhoOPdu",
+      "portIdx": 11
+    },
+    "n5qqGldT": {
+      "labelName": "out2b_0",
+      "nodeId": "_KVQLZoP0",
+      "portIdx": 3
+    }
+  }
+}

@@ -119,6 +119,10 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
 
   errors = []
   for error in compiled.errors:
+    # suppress some manufacturability warnings
+    if error.name == 'required basic part':
+      continue
+
     errors.append(CompilerError(
       path=edgir.local_path_to_str_list(error.path),
       kind=error.kind,
