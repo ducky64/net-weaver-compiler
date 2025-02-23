@@ -31,6 +31,10 @@ def port_to_dir(name: str, target: edgir.ref_pb2.LibraryPath) -> Optional[str]:
 
   if simpleTarget == 'Passive':
     return None
+  elif simpleTarget == 'Ground':
+    return 'down'
+  elif simpleTarget == 'GroundReference':
+    return 'down'
 
   elif simpleTarget == 'VoltageSource':
     return 'right'
@@ -41,8 +45,6 @@ def port_to_dir(name: str, target: edgir.ref_pb2.LibraryPath) -> Optional[str]:
       return 'up'
 
   elif simpleTarget == 'DigitalSource':
-    return 'right'
-  elif simpleTarget == 'DigitalSingleSource':
     return 'right'
   elif simpleTarget == 'DigitalSink':
     return 'left'
@@ -68,11 +70,31 @@ def port_to_dir(name: str, target: edgir.ref_pb2.LibraryPath) -> Optional[str]:
   elif simpleTarget == 'SpiPeripheral':
     return 'left'
 
+  elif simpleTarget == 'UartPort':
+    return None
+
   elif simpleTarget == 'UsbHostPort':
     return 'right'
   elif simpleTarget == 'UsbDevicePort':
     return 'left'
   elif simpleTarget == 'UsbPassivePort':
+    return 'left'
+
+  elif simpleTarget == 'UsbCcPort':
+    return None
+
+  elif simpleTarget == 'CanDiffPort':
+    return None
+  elif simpleTarget == 'CanControllerPort':
+    return 'right'
+  elif simpleTarget == 'CanTransceiverPort':
+    return 'left'
+  elif simpleTarget == 'CanPassivePort':
+    return None
+
+  elif simpleTarget == 'I2sController':
+    return 'right'
+  elif simpleTarget == 'I2sTargetReceiver':
     return 'left'
 
   else:
@@ -101,8 +123,6 @@ def port_to_signal_dir(pair: edgir.elem_pb2.NamedPortLike) -> Optional[str]:
     return 'sink'
 
   elif simpleTarget == 'DigitalSource':
-    return 'source'
-  elif simpleTarget == 'DigitalSingleSource':
     return 'source'
   elif simpleTarget == 'DigitalSink':
     return 'sink'
