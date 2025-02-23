@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple, Type
+from typing import Optional, List, Tuple, Type, NamedTuple, Dict
 from netweaver_interface import JsonNetlist, JsonLabel, JsonNode, JsonNodePort
 from PolymorphicBlocks import edg
 
@@ -10,11 +10,10 @@ class JsonNetlistValidationError(Exception):
     self.desc = desc
 
 
-class Connection:
-  def __init__(self, name: str, ports: list[Tuple[JsonNode, JsonNodePort]], labels: list[JsonLabel]):
-    self.name = name
-    self.ports = ports
-    self.labels = labels
+class Connection(NamedTuple):
+  name: str
+  ports: list[Tuple[JsonNode, JsonNodePort]]
+  labels: list[JsonLabel]
 
   def is_array(self) -> bool:
     is_array: Optional[bool] = None
@@ -117,6 +116,38 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
       assert (label.nodeId, label.portIdx) not in connections_by_node_port, "duplicate label"
       connections_by_node_port[(label.nodeId, label.portIdx)] = connection
 
+  additional_connections: Dict[str, List[str]] = {}  # connection name, [hdl]
+  additional_blocks: List[Tuple[str, str]] = []  # block name, block HDL
+
+  # infer needed parts, just I2C pullup for now
+  for name, connection in connections_by_name.items():
+    # i2c pull power is connected to the first connected power port of the controller
+    I2C_IMPLICIT_CONTROLLER_POWER_PORTS = ['pwr_out', 'pwr']
+
+    connection_is_i2c = False
+    i2c_has_pullup = False
+    controller_node = None
+    for node, port in connection.ports:
+      if port.type.endswith('I2cController') or port.type.endswith('I2cTarget'):
+        connection_is_i2c = True
+      if port.type.endswith('I2cController') and controller_node is None:  # take the first controller
+        controller_node = node
+      if node.data.type.endswith('I2cPullup'):
+        i2c_has_pullup = True
+    if connection_is_i2c and not i2c_has_pullup and controller_node is not None:
+      # determine power node, from controller
+      controller_power_net = None
+      controller_port_name_to_idx = {port.name: port.idx for port in controller_node.data.ports}
+      for candidate_port_name in I2C_IMPLICIT_CONTROLLER_POWER_PORTS:
+        controller_port_idx = controller_port_name_to_idx.get(candidate_port_name, None)
+        if (controller_node.id, controller_port_idx) in connections_by_node_port:
+          controller_power_net = connections_by_node_port[(controller_node.id, controller_port_idx)].name
+      if controller_power_net is not None:
+        pullup_name = f'_implicit_i2c_pullup_{name}'
+        additional_blocks.append((pullup_name, 'I2cPullup()'))
+        additional_connections.setdefault(controller_power_net, []).append(f'{pullup_name}.pwr')
+        additional_connections.setdefault(name, []).append(f'{pullup_name}.i2c')
+
   # then directed edges
   # TODO currently not supported in frontend
   # for name, edge in netlist.graph.edges.items():
@@ -189,6 +220,10 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
 
     blocks_code.append(block_code)
 
+  # generate additional blocks
+  for name, block_hdl in additional_blocks:
+    blocks_code.append(f"self.{name} = self.Block({block_hdl})")
+
   # generate connect statements
   connections_code = []
   for name, connection in connections_by_name.items():
@@ -207,6 +242,9 @@ def tohdl_netlist(netlist: JsonNetlist) -> str:
           port_hdls.append(f"self.{containing_node.data.name}.{port_parent_port}.request('{port.name}')")
       else:  # single port
         port_hdls.append(f"self.{containing_node.data.name}.{port.name}")
+
+    for connect_hdl in additional_connections.get(name, []):
+      port_hdls.append(f"self.{connect_hdl}")
 
     connections_code.append(f"self.connect({', '.join(port_hdls)})")
 

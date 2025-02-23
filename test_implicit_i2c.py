@@ -15,13 +15,12 @@ class MyModule(SimpleBoardTop):
     self.Hdc1080 = self.Block(Hdc1080())
     self.Bme680 = self.Block(Bme680())
     self.Bh1750 = self.Block(Bh1750())
-
-    self._implicit_i2c_pullup = self.Block(I2cPullup())
+    self._implicit_i2c_pullup_i2c = self.Block(I2cPullup())
 
     self.connect(self.UsbCReceptacle.pwr, self.Ldl1117.pwr_in)
     self.connect(self.Ldl1117.gnd, self.Esp32_Wroom_32.gnd, self.Hdc1080.gnd, self.Bme680.gnd, self.Bh1750.gnd, self.UsbCReceptacle.gnd)
-    self.connect(self.Esp32_Wroom_32.i2c.request('i2c_16'), self.Hdc1080.i2c, self.Bme680.i2c, self.Bh1750.i2c, self._implicit_i2c_pullup.i2c)
-    self.connect(self.Esp32_Wroom_32.pwr, self.Hdc1080.pwr, self.Bme680.pwr, self.Bh1750.pwr, self.Ldl1117.pwr_out, self._implicit_i2c_pullup.pwr)
+    self.connect(self.Bme680.i2c, self.Bh1750.i2c, self.Hdc1080.i2c, self.Esp32_Wroom_32.i2c.request('i2c_16'), self._implicit_i2c_pullup_i2c.i2c)
+    self.connect(self.Esp32_Wroom_32.pwr, self.Hdc1080.pwr, self.Bme680.pwr, self.Bh1750.pwr, self.Ldl1117.pwr_out, self._implicit_i2c_pullup_i2c.pwr)
 """
 
 
