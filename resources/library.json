@@ -161,7 +161,7 @@
     },
     {
       "name": "",
-      "type": "AABattery",
+      "type": "AaBattery",
       "superClasses": [
         "Battery",
         "PowerSource"
@@ -193,8 +193,8 @@
           "name": "voltage",
           "type": "range",
           "default_value": [
-            1.3,
-            1.7
+            1.0,
+            1.6
           ],
           "docstring": null
         },
@@ -202,14 +202,63 @@
           "name": "actual_voltage",
           "type": "range",
           "default_value": [
-            1.3,
-            1.7
+            1.0,
+            1.6
           ],
           "docstring": null
         }
       ],
       "is_abstract": false,
-      "docstring": "AA Alkaline battery"
+      "docstring": "AA battery holder supporting alkaline and rechargeable chemistries."
+    },
+    {
+      "name": "",
+      "type": "AaBatteryStack",
+      "superClasses": [
+        "Battery",
+        "PowerSource"
+      ],
+      "ports": [
+        {
+          "name": "pwr",
+          "type": "VoltageSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": "down",
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        }
+      ],
+      "argParams": [
+        {
+          "name": "count",
+          "type": "int",
+          "default_value": 1,
+          "docstring": null
+        },
+        {
+          "name": "cell_actual_voltage",
+          "type": "range",
+          "default_value": [
+            1.0,
+            1.6
+          ],
+          "docstring": null
+        }
+      ],
+      "is_abstract": false,
+      "docstring": "AA Alkaline battery stack that generates batteries in series"
     },
     {
       "name": "",
@@ -7570,7 +7619,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port, typically of the device's Vdd or VddIO rail; must be used with gnd_out"
+          "docstring": "Power output port, typically of the device's Vdd or VddIO rail at 3.3v"
         },
         {
           "name": "vusb_out",
@@ -7580,7 +7629,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port of the device's Vbus, typically 5v; must be used with gnd_out"
+          "docstring": "Power output port of the device's Vbus, typically 5v"
         }
       ],
       "argParams": [],
@@ -8495,7 +8544,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port, typically of the device's Vdd or VddIO rail; must be used with gnd_out"
+          "docstring": "Power output port, typically of the device's Vdd or VddIO rail at 3.3v"
         },
         {
           "name": "vusb_out",
@@ -8505,7 +8554,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port of the device's Vbus, typically 5v; must be used with gnd_out"
+          "docstring": "Power output port of the device's Vbus, typically 5v"
         },
         {
           "name": "io2",
@@ -8678,7 +8727,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port, typically of the device's Vdd or VddIO rail; must be used with gnd_out"
+          "docstring": "Power output port, typically of the device's Vdd or VddIO rail at 3.3v"
         },
         {
           "name": "vusb_out",
@@ -8688,7 +8737,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port of the device's Vbus, typically 5v; must be used with gnd_out"
+          "docstring": "Power output port of the device's Vbus, typically 5v"
         }
       ],
       "argParams": [],
@@ -14895,7 +14944,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port, typically of the device's Vdd or VddIO rail; must be used with gnd_out"
+          "docstring": "Power output port, typically of the device's Vdd or VddIO rail at 3.3v"
         },
         {
           "name": "vusb_out",
@@ -14905,7 +14954,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port of the device's Vbus, typically 5v; must be used with gnd_out"
+          "docstring": "Power output port of the device's Vbus, typically 5v"
         }
       ],
       "argParams": [],
@@ -23448,7 +23497,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port, typically of the device's Vdd or VddIO rail; must be used with gnd_out"
+          "docstring": "Power output port, typically of the device's Vdd or VddIO rail at 3.3v"
         },
         {
           "name": "vusb_out",
@@ -23458,7 +23507,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port of the device's Vbus, typically 5v; must be used with gnd_out"
+          "docstring": "Power output port of the device's Vbus, typically 5v"
         }
       ],
       "argParams": [],
@@ -23564,6 +23613,16 @@
           "docstring": "Microcontroller I2C targets, each element is an independent I2C target"
         },
         {
+          "name": "pwr_vin",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "Power input pin, typically rated for 5v or a bit beyond."
+        },
+        {
           "name": "pwr_out",
           "type": "VoltageSource",
           "is_array": false,
@@ -23571,7 +23630,7 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port, typically of the device's Vdd or VddIO rail; must be used with gnd_out"
+          "docstring": "Power output port, typically of the device's Vdd or VddIO rail at 3.3v"
         },
         {
           "name": "vusb_out",
@@ -23581,12 +23640,12 @@
           "hint_signal_direction": "source",
           "hint_array_direction": null,
           "required": false,
-          "docstring": "Power output port of the device's Vbus, typically 5v; must be used with gnd_out"
+          "docstring": "Power output port of the device's Vbus, typically 5v"
         }
       ],
       "argParams": [],
       "is_abstract": false,
-      "docstring": "RP2040 development board, a tiny development (21x17.5mm) daughterboard.\nHas an onboard USB connector, so this can also source power.\n\nLimited pins (only 11 for IOs, of which 6 are usable as the other 5 have boot requirements).\n\nRequires Seeed Studio's KiCad library for the footprint: https://github.com/Seeed-Studio/OPL_Kicad_Library\nThe 'Seeed Studio XIAO Series Library' must have been added as a footprint library of the same name.\n\nPinning data: https://www.seeedstudio.com/blog/wp-content/uploads/2022/08/Seeed-Studio-XIAO-Series-Package-and-PCB-Design.pdf"
+      "docstring": "RP2040 development board, a tiny development (21x17.5mm) daughterboard.\nHas an onboard USB connector, so this can also source power.\n\nLimited pins (only 11 for IOs, of which 6 are usable as the other 5 have boot requirements).\n\nRequires Seeed Studio's KiCad library for the footprint: https://github.com/Seeed-Studio/OPL_Kicad_Library\nThe 'Seeed Studio XIAO Series Library' must have been added as a footprint library of the same name.\n\nPinning data: https://www.seeedstudio.com/blog/wp-content/uploads/2022/08/Seeed-Studio-XIAO-Series-Package-and-PCB-Design.pdf\nInternal data: https://files.seeedstudio.com/wiki/XIAO-RP2040/res/Seeed-Studio-XIAO-RP2040-v1.3.pdf"
     }
   ],
   "links": [
@@ -25441,7 +25500,11 @@
             "name": "Battery",
             "children": [
               {
-                "name": "AABattery",
+                "name": "AaBattery",
+                "children": []
+              },
+              {
+                "name": "AaBatteryStack",
                 "children": []
               },
               {
