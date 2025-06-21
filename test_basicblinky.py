@@ -79,9 +79,9 @@ EXPECTED_KICAD_NETLIST = """\
 )"""
 
 EXPECTED_SVGPCB_INSTANTIATIONS = [
-  "const Xiao_Esp32c3 = board.add(XIAO_Generic_Hybrid_14P_2_54_21X17_8MM, {\n  translate: pt(0, 0), rotate: 0,\n  id: 'Xiao_Esp32c3'\n})",
-  "const IndicatorLed_package = board.add(LED_0603_1608Metric, {\n  translate: pt(0, 0), rotate: 0,\n  id: 'IndicatorLed_package'\n})",
-  "const IndicatorLed_res = board.add(R_0603_1608Metric, {\n  translate: pt(0, 0), rotate: 0,\n  id: 'IndicatorLed_res'\n})"
+  "const Xiao_Esp32c3 = board.add(XIAO_Generic_Hybrid_14P_2_54_21X17_8MM, {\n  translate: pt(0.350, 0.000), rotate: 0,\n  id: 'Xiao_Esp32c3'\n})",
+  "const IndicatorLed_package = board.add(LED_0603_1608Metric, {\n  translate: pt(0.859, 0.000), rotate: 0,\n  id: 'IndicatorLed_package'\n})",
+  "const IndicatorLed_res = board.add(R_0603_1608Metric, {\n  translate: pt(1.076, 0.000), rotate: 0,\n  id: 'IndicatorLed_res'\n})"
 ]
 
 
