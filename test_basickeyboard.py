@@ -9,8 +9,8 @@ class MyModule(SimpleBoardTop):
   def __init__(self):
     super().__init__()
 
-    self.SwitchMatrix = self.Block(SwitchMatrix(nrows=3, ncols=2))
     self.Xiao_Rp2040 = self.Block(Xiao_Rp2040())
+    self.SwitchMatrix = self.Block(SwitchMatrix(nrows=3, ncols=2))
 
     self.connect(self.SwitchMatrix.cols, self.Xiao_Rp2040.gpio.request_vector('gpio_12'))
     self.connect(self.SwitchMatrix.rows, self.Xiao_Rp2040.gpio.request_vector('gpio_13'))
