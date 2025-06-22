@@ -1,0 +1,381 @@
+{
+  "nets": [
+    [
+      {
+        "nodeId": "_7oOkFtCe",
+        "portIdx": 1,
+        "name": "_7oOkFtCe",
+        "portName": "signals"
+      },
+      {
+        "nodeId": "_iMSE84A9",
+        "portIdx": 13,
+        "name": "_iMSE84A9",
+        "portName": "gpio_13"
+      }
+    ],
+    [
+      {
+        "nodeId": "_7oOkFtCe",
+        "portIdx": 0,
+        "name": "_7oOkFtCe",
+        "portName": "pwr"
+      },
+      {
+        "nodeId": "_iMSE84A9",
+        "portIdx": 11,
+        "name": "_iMSE84A9",
+        "portName": "pwr_out"
+      }
+    ],
+    [
+      {
+        "nodeId": "_S0j305Mc",
+        "portIdx": 0,
+        "name": "_S0j305Mc",
+        "portName": "ios"
+      },
+      {
+        "nodeId": "_iMSE84A9",
+        "portIdx": 14,
+        "name": "_iMSE84A9",
+        "portName": "gpio_14"
+      }
+    ]
+  ],
+  "graph": {
+    "nodes": {
+      "_iMSE84A9": {
+        "data": {
+          "name": "Xiao_Esp32c3",
+          "type": "Xiao_Esp32c3",
+          "superClasses": [
+            "IoController",
+            "ProgrammableController"
+          ],
+          "ports": [
+            {
+              "name": "gpio",
+              "leftRightUpDown": "left",
+              "type": "DigitalBidir",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 0
+            },
+            {
+              "name": "adc",
+              "leftRightUpDown": "left",
+              "type": "AnalogSink",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 1
+            },
+            {
+              "name": "spi",
+              "leftRightUpDown": "right",
+              "type": "SpiController",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 2
+            },
+            {
+              "name": "i2c",
+              "leftRightUpDown": "right",
+              "type": "I2cController",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 3
+            },
+            {
+              "name": "uart",
+              "leftRightUpDown": "left",
+              "type": "UartPort",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 4
+            },
+            {
+              "name": "usb",
+              "leftRightUpDown": "left",
+              "type": "UsbDevicePort",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 5
+            },
+            {
+              "name": "gnd",
+              "leftRightUpDown": "left",
+              "type": "Ground",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 6
+            },
+            {
+              "name": "pwr",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 7
+            },
+            {
+              "name": "i2s",
+              "leftRightUpDown": "right",
+              "type": "I2sController",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 8
+            },
+            {
+              "name": "i2c_target",
+              "leftRightUpDown": "left",
+              "type": "I2cTarget",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 9
+            },
+            {
+              "name": "spi_peripheral",
+              "leftRightUpDown": "left",
+              "type": "SpiPeripheral",
+              "array": true,
+              "srcSinkBi": "sink",
+              "required": false,
+              "idx": 10
+            },
+            {
+              "name": "pwr_out",
+              "leftRightUpDown": "right",
+              "type": "VoltageSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 11
+            },
+            {
+              "name": "vusb_out",
+              "leftRightUpDown": "right",
+              "type": "VoltageSource",
+              "array": false,
+              "srcSinkBi": null,
+              "required": false,
+              "idx": 12
+            },
+            {
+              "name": "gpio_13",
+              "array": false,
+              "idx": 13,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            },
+            {
+              "name": "gpio_14",
+              "array": false,
+              "idx": 14,
+              "leftRightUpDown": "left",
+              "srcSinkBi": "bi",
+              "type": "DigitalBidir",
+              "elementOf": 0
+            }
+          ],
+          "argParams": []
+        },
+        "ports": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "id": "_iMSE84A9"
+      },
+      "_7oOkFtCe": {
+        "data": {
+          "name": "IndicatorSinkRgbLed",
+          "type": "IndicatorSinkRgbLed",
+          "superClasses": [
+            "Light",
+            "HumanInterface"
+          ],
+          "ports": [
+            {
+              "name": "pwr",
+              "leftRightUpDown": "left",
+              "type": "VoltageSink",
+              "array": false,
+              "srcSinkBi": null,
+              "required": true,
+              "idx": 0
+            },
+            {
+              "name": "signals",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": true,
+              "srcSinkBi": "source",
+              "required": false,
+              "idx": 1
+            }
+          ],
+          "argParams": [
+            {
+              "name": "current_draw",
+              "type": "range",
+              "default_value": [
+                0.001,
+                0.01
+              ],
+              "docstring": null,
+              "value": [
+                0.001,
+                0.01
+              ]
+            }
+          ]
+        },
+        "ports": [
+          [],
+          []
+        ],
+        "id": "_7oOkFtCe"
+      },
+      "_S0j305Mc": {
+        "data": {
+          "name": "CharlieplexedLedMatrix",
+          "type": "CharlieplexedLedMatrix",
+          "superClasses": [
+            "Light",
+            "HumanInterface"
+          ],
+          "ports": [
+            {
+              "name": "ios",
+              "leftRightUpDown": "left",
+              "type": "DigitalSink",
+              "array": true,
+              "srcSinkBi": "source",
+              "required": false,
+              "idx": 0
+            }
+          ],
+          "argParams": [
+            {
+              "name": "nrows",
+              "type": "int",
+              "default_value": null,
+              "docstring": null,
+              "value": 2
+            },
+            {
+              "name": "ncols",
+              "type": "int",
+              "default_value": null,
+              "docstring": null,
+              "value": 3
+            },
+            {
+              "name": "color",
+              "type": "str",
+              "default_value": "",
+              "docstring": null,
+              "value": ""
+            },
+            {
+              "name": "current_draw",
+              "type": "range",
+              "default_value": [
+                0.001,
+                0.01
+              ],
+              "docstring": null,
+              "value": [
+                0.001,
+                0.01
+              ]
+            }
+          ]
+        },
+        "ports": [
+          []
+        ],
+        "id": "_S0j305Mc"
+      }
+    },
+    "edges": {}
+  },
+  "graphUIData": {
+    "_iMSE84A9": {
+      "x": 254,
+      "y": 167.39999389648438
+    },
+    "_7oOkFtCe": {
+      "x": 520,
+      "y": 171.39999389648438
+    },
+    "_S0j305Mc": {
+      "x": 517,
+      "y": 300.3999938964844
+    }
+  },
+  "labels": {
+    "IbSpT3Sy": {
+      "labelName": "gnd",
+      "nodeId": "_iMSE84A9",
+      "portIdx": 6
+    },
+    "omTCvqyc": {
+      "labelName": "signals",
+      "nodeId": "_7oOkFtCe",
+      "portIdx": 1
+    },
+    "DbGbCITh": {
+      "labelName": "signals",
+      "nodeId": "_iMSE84A9",
+      "portIdx": 13
+    },
+    "IbRGHUKH": {
+      "labelName": "pwr",
+      "nodeId": "_7oOkFtCe",
+      "portIdx": 0
+    },
+    "s7VB4L8t": {
+      "labelName": "pwr",
+      "nodeId": "_iMSE84A9",
+      "portIdx": 11
+    },
+    "C9ZLeIcK": {
+      "labelName": "ios",
+      "nodeId": "_S0j305Mc",
+      "portIdx": 0
+    },
+    "jKyuVMi0": {
+      "labelName": "ios",
+      "nodeId": "_iMSE84A9",
+      "portIdx": 14
+    }
+  }
+}
