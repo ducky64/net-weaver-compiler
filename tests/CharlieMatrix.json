@@ -2,22 +2,22 @@
   "nets": [
     [
       {
-        "nodeId": "_IML5kDgu",
+        "nodeId": "_S0j305Mc",
         "portIdx": 0,
-        "name": "_IML5kDgu",
+        "name": "_S0j305Mc",
         "portName": "ios"
       },
       {
-        "nodeId": "_o6DrNQan",
-        "portIdx": 14,
-        "name": "_o6DrNQan",
+        "nodeId": "_iMSE84A9",
+        "portIdx": 13,
+        "name": "_iMSE84A9",
         "portName": "gpio_14"
       }
     ]
   ],
   "graph": {
     "nodes": {
-      "_o6DrNQan": {
+      "_iMSE84A9": {
         "data": {
           "name": "Xiao_Esp32c3",
           "type": "Xiao_Esp32c3",
@@ -81,16 +81,16 @@
               "idx": 5
             },
             {
-              "name": "pwr",
+              "name": "gnd",
               "leftRightUpDown": "left",
-              "type": "VoltageSink",
+              "type": "Ground",
               "array": false,
               "srcSinkBi": null,
               "required": false,
               "idx": 6
             },
             {
-              "name": "gnd",
+              "name": "pwr",
               "leftRightUpDown": "left",
               "type": "VoltageSink",
               "array": false,
@@ -100,7 +100,7 @@
             },
             {
               "name": "i2s",
-              "leftRightUpDown": "left",
+              "leftRightUpDown": "right",
               "type": "I2sController",
               "array": true,
               "srcSinkBi": "sink",
@@ -126,7 +126,7 @@
               "idx": 10
             },
             {
-              "name": "gnd_out",
+              "name": "pwr_out",
               "leftRightUpDown": "right",
               "type": "VoltageSource",
               "array": false,
@@ -135,7 +135,7 @@
               "idx": 11
             },
             {
-              "name": "pwr_out",
+              "name": "vusb_out",
               "leftRightUpDown": "right",
               "type": "VoltageSource",
               "array": false,
@@ -144,18 +144,9 @@
               "idx": 12
             },
             {
-              "name": "vusb_out",
-              "leftRightUpDown": "right",
-              "type": "VoltageSource",
-              "array": false,
-              "srcSinkBi": null,
-              "required": false,
-              "idx": 13
-            },
-            {
               "name": "gpio_14",
               "array": false,
-              "idx": 14,
+              "idx": 13,
               "leftRightUpDown": "left",
               "srcSinkBi": "bi",
               "type": "DigitalBidir",
@@ -179,11 +170,13 @@
           [],
           [],
           [],
+          [],
+          [],
           []
         ],
-        "id": "_o6DrNQan"
+        "id": "_iMSE84A9"
       },
-      "_IML5kDgu": {
+      "_S0j305Mc": {
         "data": {
           "name": "CharlieplexedLedMatrix",
           "type": "CharlieplexedLedMatrix",
@@ -242,31 +235,31 @@
         "ports": [
           []
         ],
-        "id": "_IML5kDgu"
+        "id": "_S0j305Mc"
       }
     },
     "edges": {}
   },
   "graphUIData": {
-    "_o6DrNQan": {
-      "x": 316,
-      "y": 168
+    "_iMSE84A9": {
+      "x": 254,
+      "y": 167.39999389648438
     },
-    "_IML5kDgu": {
-      "x": 571,
-      "y": 171
+    "_S0j305Mc": {
+      "x": 529,
+      "y": 168.39999389648438
     }
   },
   "labels": {
-    "mOzBXUqm": {
+    "C9ZLeIcK": {
       "labelName": "ios",
-      "nodeId": "_IML5kDgu",
+      "nodeId": "_S0j305Mc",
       "portIdx": 0
     },
-    "lfc3wuRw": {
+    "jKyuVMi0": {
       "labelName": "ios",
-      "nodeId": "_o6DrNQan",
-      "portIdx": 14
+      "nodeId": "_iMSE84A9",
+      "portIdx": 13
     }
   }
 }
