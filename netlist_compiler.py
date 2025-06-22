@@ -32,6 +32,7 @@ class CompilerResult(BaseModel):
   kicadFootprints: Optional[list[KicadFootprint]] = None
   svgpcbFunctions: Optional[list[str]] = None
   svgpcbInstantiations: Optional[list[str]] = None
+  bom: Optional[str] = None  # CSV string of the BOM
   errors: list[CompilerError] = []
 
 
@@ -67,10 +68,12 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
 
   from PolymorphicBlocks.edg.electronics_model.NetlistGenerator import NetlistTransform
   from PolymorphicBlocks.edg.electronics_model.footprint import generate_netlist
+  from PolymorphicBlocks.edg.electronics_model.BomBackend import GenerateBom
   from PolymorphicBlocks.edg import SvgPcbTemplateBlock, SvgPcbBackend
 
   netlist = NetlistTransform(compiled).run()
   kicad_netlist = generate_netlist(netlist, True)
+  bom = GenerateBom().run(compiled)[0][1]
 
   # generate structured netlist
   nets_obj = [ResultNet(
@@ -137,5 +140,6 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
     kicadFootprints=all_footprints,
     svgpcbFunctions=svgpcb_result.functions,
     svgpcbInstantiations=svgpcb_result.instantiations,
+    bom=bom,
     errors=errors
   )

@@ -87,6 +87,13 @@ EXPECTED_SVGPCB_INSTANTIATIONS = [
   "const IndicatorLed_res = board.add(R_0603_1608Metric, {\n  translate: pt(1.075, 0.000), rotate: 0,\n  id: 'IndicatorLed_res'\n})"
 ]
 
+EXPECTED_BOM = """\
+Id,Designator,Footprint,Quantity,Designation,Supplier and Ref,JLCPCB Part #,Manufacturer,Part
+1,U1,Seeed Studio XIAO Series Library:XIAO-ESP32C3-SMD,1,,,,,XIAO ESP32C3
+2,D1,LED_SMD:LED_0603_1608Metric,1,Red 615~630nm 1.9~2.2V 0603 Light Emitting Diodes (LED) RoHS,,C2286,Hubei KENTO Elec,KT-0603R
+3,R1,Resistor_SMD:R_0603_1608Metric,1,±1% 1/10W Thick Film Resistors 75V ±100ppm/℃ -55℃~+155℃ 1kΩ 0603 Chip Resistor - Surface Mount ROHS,,C21190,UNI-ROYAL(Uniroyal Elec),0603WAF1001T5E
+"""
+
 
 class BasicBlinkyTestCase(unittest.TestCase):
   def test_compile(self):
@@ -107,3 +114,5 @@ class BasicBlinkyTestCase(unittest.TestCase):
 
       self.assertEqual(response.json['svgpcbFunctions'], [])
       self.assertEqual(response.json['svgpcbInstantiations'], EXPECTED_SVGPCB_INSTANTIATIONS)
+
+      self.assertEqual(response.json['bom'], EXPECTED_BOM)
