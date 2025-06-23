@@ -30,8 +30,7 @@ class CompilerResult(BaseModel):
   netlist: list[ResultNet] = []
   kicadNetlist: Optional[str] = None
   kicadFootprints: Optional[list[KicadFootprint]] = None
-  svgpcbFunctions: Optional[list[str]] = None
-  svgpcbInstantiations: Optional[list[str]] = None
+  svgpcb: Optional[str] = None
   bom: Optional[str] = None  # CSV string of the BOM
   errors: list[CompilerError] = []
 
@@ -138,8 +137,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
     netlist=nets_obj,
     kicadNetlist=cast(str, kicad_netlist),
     kicadFootprints=all_footprints,
-    svgpcbFunctions=svgpcb_result.functions,
-    svgpcbInstantiations=svgpcb_result.instantiations,
+    svgpcb=svgpcb_result,
     bom=bom,
     errors=errors
   )
