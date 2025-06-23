@@ -12,7 +12,8 @@ CORS(app)
 
 @app.route("/version", methods=['GET'])
 def version():
-  return "0.12"
+  return "0.13"
+
 
 @app.route("/compile", methods=['POST', 'OPTIONS'])
 @cross_origin(origins=['*'])
@@ -43,6 +44,7 @@ def compile():
     ).model_dump()), 400
 
   return jsonify(result.model_dump())
+
 
 @app.route("/library", methods=['GET'])
 @cross_origin(origins=['*'])
