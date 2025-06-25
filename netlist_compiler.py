@@ -13,11 +13,6 @@ class KicadFootprint(BaseModel):
   data: str  # raw Kicad .kicad_mod data
 
 
-class ResultNet(BaseModel):
-  name: str
-  pads: list[list[str]]  # nested list is [block name, pin name]
-
-
 class CompilerError(BaseModel):
   path: list[str]  # path to link / block / port, not including the constraint (if any)
   kind: str  # kind of error, eg "uncompiled block", "failed assertion"
@@ -27,7 +22,6 @@ class CompilerError(BaseModel):
 
 class CompilerResult(BaseModel):
   edgHdl: str
-  netlist: list[ResultNet] = []
   kicadNetlist: Optional[str] = None
   kicadFootprints: Optional[list[KicadFootprint]] = None
   svgpcb: Optional[str] = None
@@ -73,13 +67,6 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
   netlist = NetlistTransform(compiled).run()
   kicad_netlist = generate_netlist(netlist, True)
   bom = GenerateBom().run(compiled)[0][1]
-
-  # generate structured netlist
-  nets_obj = [ResultNet(
-    name=net.name,
-    pads=[[SvgPcbTemplateBlock._svgpcb_pathname_to_svgpcb(pin.block_path), pin.pin_name]
-          for pin in net.pins])
-    for net in netlist.nets]
 
   # fetch KiCad data
   all_block_footprints = []  # preserve ordering
@@ -134,7 +121,6 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
 
   return CompilerResult(
     edgHdl=hdl,
-    netlist=nets_obj,
     kicadNetlist=cast(str, kicad_netlist),
     kicadFootprints=all_footprints,
     svgpcb=svgpcb_result,

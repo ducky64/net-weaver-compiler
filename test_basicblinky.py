@@ -18,14 +18,6 @@ class MyModule(SimpleBoardTop):
     self.connect(self.IndicatorLed.gnd, self.Xiao_Esp32c3.gnd)
 """
 
-EXPECTED_NETLIST = [
-  {'name': 'IndicatorLed.signal', 'pads': [['Xiao_Esp32c3', '2'], ['IndicatorLed_package', '2']]},
-  {'name': 'IndicatorLed.gnd', 'pads': [['Xiao_Esp32c3', '13'], ['IndicatorLed_res', '2']]},
-  {'name': 'Xiao_Esp32c3.pwr_out', 'pads': [['Xiao_Esp32c3', '12']]},
-  {'name': 'Xiao_Esp32c3.vusb_out', 'pads': [['Xiao_Esp32c3', '14']]},
-  {'name': 'IndicatorLed.res.a', 'pads': [['IndicatorLed_res', '1'], ['IndicatorLed_package', '1']]}
-]
-
 EXPECTED_KICAD_NETLIST = """\
 (export (version D)
 (components
@@ -84,18 +76,29 @@ EXPECTED_KICAD_NETLIST = """\
 EXPECTED_SVGPCB = """\
 const board = new PCB();
 
-const Xiao_Esp32c3 = board.add(XIAO_ESP32C3_SMD, {
+// Xiao_Esp32c3
+const U1 = board.add(XIAO_ESP32C3_SMD, {
   translate: pt(0.348, 0.412), rotate: 0,
-  id: 'Xiao_Esp32c3'
+  id: 'U1'
 })
-const IndicatorLed_package = board.add(LED_0603_1608Metric, {
+// IndicatorLed.package
+const D1 = board.add(LED_0603_1608Metric, {
   translate: pt(0.798, 0.029), rotate: 0,
-  id: 'IndicatorLed_package'
+  id: 'D1'
 })
-const IndicatorLed_res = board.add(R_0603_1608Metric, {
+// IndicatorLed.res
+const R1 = board.add(R_0603_1608Metric, {
   translate: pt(0.798, 0.126), rotate: 0,
-  id: 'IndicatorLed_res'
+  id: 'R1'
 })
+
+board.setNetlist([
+  {name: "IndicatorLed.signal", pads: [["U1", "2"], ["D1", "2"]]},
+  {name: "IndicatorLed.gnd", pads: [["U1", "13"], ["R1", "2"]]},
+  {name: "Xiao_Esp32c3.pwr_out", pads: [["U1", "12"]]},
+  {name: "Xiao_Esp32c3.vusb_out", pads: [["U1", "14"]]},
+  {name: "IndicatorLed.res.a", pads: [["R1", "1"], ["D1", "1"]]}
+])
 
 const limit0 = pt(-0.07874015748031496, -0.07874015748031496);
 const limit1 = pt(0.9742125984251969, 0.9238188976377953);
@@ -159,7 +162,6 @@ class BasicBlinkyTestCase(unittest.TestCase):
       self.assertEqual(response.status_code, 200)
       self.assertEqual(response.json['edgHdl'], EXPECTED_HDL)
       self.assertEqual(response.json['errors'], [])
-      self.assertEqual(response.json['netlist'], EXPECTED_NETLIST)
       self.assertEqual(response.json['kicadNetlist'], EXPECTED_KICAD_NETLIST)
       self.assertEqual(response.json['svgpcb'], EXPECTED_SVGPCB)
       self.assertEqual(response.json['bom'], EXPECTED_BOM)

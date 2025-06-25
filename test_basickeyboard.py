@@ -19,14 +19,32 @@ class MyModule(SimpleBoardTop):
 EXPECTED_SVGPCB = """\
 const board = new PCB();
 
-const SwitchMatrix = SwitchMatrix_2_3_SwitchMatrix(pt(0, 0))
-const Xiao_Rp2040 = board.add(XIAO_RP2040_SMD, {
-  translate: pt(0.348, 1.394), rotate: 0,
-  id: 'Xiao_Rp2040'
+const SwitchMatrix = SwitchMatrix_2_3_SwitchMatrix(pt(0.039, 0.039))
+// Xiao_Rp2040
+const U1 = board.add(XIAO_RP2040_SMD, {
+  translate: pt(1.466, 0.410), rotate: 0,
+  id: 'U1'
 })
 
+board.setNetlist([
+  {name: "Xiao_Rp2040.gpio.gpio_12_0", pads: [["U1", "7"], ["SW1", "2"], ["SW2", "2"], ["SW3", "2"]]},
+  {name: "Xiao_Rp2040.gpio.gpio_12_1", pads: [["U1", "8"], ["SW4", "2"], ["SW5", "2"], ["SW6", "2"]]},
+  {name: "Xiao_Rp2040.gpio.gpio_13_0", pads: [["U1", "9"], ["D1", "2"], ["D4", "2"]]},
+  {name: "Xiao_Rp2040.gpio.gpio_13_1", pads: [["U1", "11"], ["D2", "2"], ["D5", "2"]]},
+  {name: "Xiao_Rp2040.gpio.gpio_13_2", pads: [["U1", "10"], ["D3", "2"], ["D6", "2"]]},
+  {name: "Xiao_Rp2040.pwr_out", pads: [["U1", "12"]]},
+  {name: "Xiao_Rp2040.gnd", pads: [["U1", "13"]]},
+  {name: "Xiao_Rp2040.vusb_out", pads: [["U1", "14"]]},
+  {name: "SwitchMatrix.d[0,0].cathode", pads: [["D1", "1"], ["SW1", "1"]]},
+  {name: "SwitchMatrix.d[0,1].cathode", pads: [["D2", "1"], ["SW2", "1"]]},
+  {name: "SwitchMatrix.d[0,2].cathode", pads: [["D3", "1"], ["SW3", "1"]]},
+  {name: "SwitchMatrix.d[1,0].cathode", pads: [["D4", "1"], ["SW4", "1"]]},
+  {name: "SwitchMatrix.d[1,1].cathode", pads: [["D5", "1"], ["SW5", "1"]]},
+  {name: "SwitchMatrix.d[1,2].cathode", pads: [["D6", "1"], ["SW6", "1"]]}
+])
+
 const limit0 = pt(-0.07874015748031496, -0.07874015748031496);
-const limit1 = pt(1.1582677165354331, 1.9041338582677165);
+const limit1 = pt(1.85748031496063, 2.1181102362204722);
 const xMin = Math.min(limit0[0], limit1[0]);
 const xMax = Math.max(limit0[0], limit1[0]);
 const yMin = Math.min(limit0[1], limit1[1]);
@@ -63,7 +81,7 @@ renderPCB({
   mmPerUnit: 25.4
 })
 
-function SwitchMatrix_2_3_SwitchMatrix(xy, colSpacing=1, rowSpacing=1, diodeOffset=[0.25, 0]) {
+function SwitchMatrix_2_3_SwitchMatrix(xy, colSpacing=0.5, rowSpacing=0.5, diodeOffset=[0.25, 0]) {
   // Circuit generator params
   const ncols = 2
   const nrows = 3
@@ -88,19 +106,19 @@ function SwitchMatrix_2_3_SwitchMatrix(xy, colSpacing=1, rowSpacing=1, diodeOffs
       index = yIndex * ncols + xIndex + 1
 
       buttonPos = [xy[0] + colSpacing * xIndex, xy[1] + rowSpacing * yIndex]
-      obj.footprints[`sw[${xIndex},${yIndex}]`] = button = board.add(
+      obj.footprints[`SW${1 + xIndex * nrows + yIndex}`] = button = board.add(
         SW_SPST_SKQG_WithoutStem,
         {
           translate: buttonPos, rotate: 0,
-          id: `SwitchMatrix_sw_${xIndex}_${yIndex}_`
+          id: `SW${1 + xIndex * nrows + yIndex}`
         })
 
       diodePos = [buttonPos[0] + diodeOffset[0], buttonPos[1] + diodeOffset[1]]
-      obj[`d[${xIndex},${yIndex}]`] = diode = board.add(
+      obj[`D${1 + xIndex * nrows + yIndex}`] = diode = board.add(
         D_SOD_323,
         {
           translate: diodePos, rotate: 90,
-          id: `SwitchMatrix_d_${xIndex}_${yIndex}_`
+          id: `D${1 + xIndex * nrows + yIndex}`
         })
 
       // create stub wire for button -> column common line
