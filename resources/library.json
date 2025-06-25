@@ -2013,14 +2013,7 @@
           "docstring": null
         }
       ],
-      "argParams": [
-        {
-          "name": "ripple_current_factor",
-          "type": "range",
-          "default_value": "(0.2, 0.5)",
-          "docstring": null
-        }
-      ],
+      "argParams": [],
       "is_abstract": true,
       "docstring": "Step-up switching converter"
     },
@@ -2176,9 +2169,15 @@
       ],
       "argParams": [
         {
-          "name": "ripple_current_factor",
-          "type": "range",
-          "default_value": "(0.2, 0.5)",
+          "name": "input_ripple_limit",
+          "type": "float",
+          "default_value": 0.075,
+          "docstring": null
+        },
+        {
+          "name": "output_ripple_limit",
+          "type": "float",
+          "default_value": 0.025,
           "docstring": null
         }
       ],
@@ -2225,14 +2224,7 @@
           "docstring": null
         }
       ],
-      "argParams": [
-        {
-          "name": "ripple_current_factor",
-          "type": "range",
-          "default_value": "(0.2, 0.5)",
-          "docstring": null
-        }
-      ],
+      "argParams": [],
       "is_abstract": true,
       "docstring": "Step-down switching converter"
     },
@@ -3514,12 +3506,9 @@
           "docstring": null
         },
         {
-          "name": "voltage_drop",
+          "name": "ripple_ratio",
           "type": "range",
-          "default_value": [
-            0.0,
-            1.0
-          ],
+          "default_value": "(0.2, 0.5)",
           "docstring": null
         },
         {
@@ -3615,6 +3604,12 @@
             100000.0,
             1000000.0
           ],
+          "docstring": null
+        },
+        {
+          "name": "ripple_ratio",
+          "type": "range",
+          "default_value": "(0.2, 0.5)",
           "docstring": null
         },
         {
@@ -4874,14 +4869,7 @@
           "docstring": null
         }
       ],
-      "argParams": [
-        {
-          "name": "ripple_current_factor",
-          "type": "range",
-          "default_value": "(0.2, 0.5)",
-          "docstring": null
-        }
-      ],
+      "argParams": [],
       "is_abstract": true,
       "docstring": "Category for discrete boost converter subcircuits (as opposed to integrated components)"
     },
@@ -4928,9 +4916,15 @@
       ],
       "argParams": [
         {
-          "name": "ripple_current_factor",
-          "type": "range",
-          "default_value": "(0.2, 0.5)",
+          "name": "input_ripple_limit",
+          "type": "float",
+          "default_value": 0.075,
+          "docstring": null
+        },
+        {
+          "name": "output_ripple_limit",
+          "type": "float",
+          "default_value": 0.025,
           "docstring": null
         }
       ],
@@ -4978,14 +4972,7 @@
           "docstring": null
         }
       ],
-      "argParams": [
-        {
-          "name": "ripple_current_factor",
-          "type": "range",
-          "default_value": "(0.2, 0.5)",
-          "docstring": null
-        }
-      ],
+      "argParams": [],
       "is_abstract": true,
       "docstring": "Category for discrete buck converter subcircuits (as opposed to integrated components)"
     },
@@ -6102,6 +6089,110 @@
       "argParams": [],
       "is_abstract": false,
       "docstring": "SSD1357-based 0.96\" 128x64 RGB OLED, in either I2C or SPI mode."
+    },
+    {
+      "name": "",
+      "type": "Er_Tft_128_3",
+      "superClasses": [
+        "Lcd",
+        "Display",
+        "HumanInterface"
+      ],
+      "ports": [
+        {
+          "name": "reset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": "down",
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "spi",
+          "type": "SpiPeripheral",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "cs",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "dc",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "ctp_i2c",
+          "type": "I2cTarget",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "Touch panel interface i2c"
+        },
+        {
+          "name": "ctp_rst",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "Touch panel interface"
+        },
+        {
+          "name": "ctp_int",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "Touch panel interface"
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "GC9A01-based 1.28\" 240x240 TFT, with optional CST816S-based capacitive touch panel."
     },
     {
       "name": "",
@@ -7465,7 +7556,14 @@
           "docstring": null
         }
       ],
-      "argParams": [],
+      "argParams": [
+        {
+          "name": "require_auto_reset",
+          "type": "bool",
+          "default_value": 1.0,
+          "docstring": null
+        }
+      ],
       "is_abstract": false,
       "docstring": "UNOFFICIAL tag connect header, based on a modification of the FT232 cable\n(https://www.tag-connect.com/product/tc2030-ftdi-ttl-232rg-vsw3v3)\nbut adding the auto-programming pins (and using DTR instead of CTS into the cable).\nPower pins compatible with the official SWD header.\n\nPer boot docs, EN is connected to RTS and boot is connected to DTR (CTS on the original pinning,\nsince it doesn't have a DTR pin)."
     },
@@ -13003,6 +13101,100 @@
       "argParams": [],
       "is_abstract": false,
       "docstring": "Integrated 3d accelerometer (ranging over +/- 2/4/8/16 g) and 3d gyroscope\n(ranging over +/- 125/250/500/1000/2000 dps)."
+    },
+    {
+      "name": "",
+      "type": "Lsm6dsv16x",
+      "superClasses": [
+        "Accelerometer",
+        "Gyroscope",
+        "Sensor"
+      ],
+      "ports": [
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": "down",
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "pwr_io",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "IO supply voltage"
+        },
+        {
+          "name": "i2c",
+          "type": "I2cTarget",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": true,
+          "docstring": null
+        },
+        {
+          "name": "int1",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "Programmable interrupt. This can be configured as push-pull / open-drain."
+        },
+        {
+          "name": "int2",
+          "type": "DigitalSource",
+          "is_array": false,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "Programmable interrupt. This can be configured as push-pull / open-drain."
+        },
+        {
+          "name": "qvar1",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "qvar input pin 1"
+        },
+        {
+          "name": "qvar2",
+          "type": "Passive",
+          "is_array": false,
+          "hint_position": null,
+          "hint_signal_direction": "passive",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": "qvar input pin 2"
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": "Integrated High-edn smartphone 3d accelerometer (ranging over +/- 2/4/8/16 g) and 3d gyroscope\n(ranging over +/- 125/250/500/1000/2000 dps). Onboard sensor fusion for quaternion calculation.\nSupports external qvar for tap detections, etc."
     },
     {
       "name": "",
@@ -20265,6 +20457,235 @@
     },
     {
       "name": "",
+      "type": "Stm32g431Base",
+      "superClasses": [
+        "Microcontroller",
+        "IoController",
+        "ProgrammableController"
+      ],
+      "ports": [
+        {
+          "name": "gpio",
+          "type": "DigitalBidir",
+          "is_array": true,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller digital GPIO pins"
+        },
+        {
+          "name": "adc",
+          "type": "AnalogSink",
+          "is_array": true,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller analog input pins"
+        },
+        {
+          "name": "spi",
+          "type": "SpiController",
+          "is_array": true,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller SPI controllers, each element is an independent SPI controller"
+        },
+        {
+          "name": "i2c",
+          "type": "I2cController",
+          "is_array": true,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller I2C controllers, each element is an independent I2C controller"
+        },
+        {
+          "name": "uart",
+          "type": "UartPort",
+          "is_array": true,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller UARTs"
+        },
+        {
+          "name": "usb",
+          "type": "UsbDevicePort",
+          "is_array": true,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller USB device ports"
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": "down",
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "i2c_target",
+          "type": "I2cTarget",
+          "is_array": true,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller I2C targets, each element is an independent I2C target"
+        },
+        {
+          "name": "reset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": true,
+      "docstring": null
+    },
+    {
+      "name": "",
+      "type": "Stm32g431kb",
+      "superClasses": [
+        "Stm32g431Base",
+        "Microcontroller",
+        "IoController",
+        "ProgrammableController"
+      ],
+      "ports": [
+        {
+          "name": "gpio",
+          "type": "DigitalBidir",
+          "is_array": true,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller digital GPIO pins"
+        },
+        {
+          "name": "adc",
+          "type": "AnalogSink",
+          "is_array": true,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller analog input pins"
+        },
+        {
+          "name": "spi",
+          "type": "SpiController",
+          "is_array": true,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller SPI controllers, each element is an independent SPI controller"
+        },
+        {
+          "name": "i2c",
+          "type": "I2cController",
+          "is_array": true,
+          "hint_position": "right",
+          "hint_signal_direction": "source",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller I2C controllers, each element is an independent I2C controller"
+        },
+        {
+          "name": "uart",
+          "type": "UartPort",
+          "is_array": true,
+          "hint_position": null,
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller UARTs"
+        },
+        {
+          "name": "usb",
+          "type": "UsbDevicePort",
+          "is_array": true,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller USB device ports"
+        },
+        {
+          "name": "gnd",
+          "type": "Ground",
+          "is_array": false,
+          "hint_position": "down",
+          "hint_signal_direction": "bidir",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "pwr",
+          "type": "VoltageSink",
+          "is_array": false,
+          "hint_position": "up",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        },
+        {
+          "name": "i2c_target",
+          "type": "I2cTarget",
+          "is_array": true,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": "sink",
+          "required": false,
+          "docstring": "Microcontroller I2C targets, each element is an independent I2C target"
+        },
+        {
+          "name": "reset",
+          "type": "DigitalSink",
+          "is_array": false,
+          "hint_position": "left",
+          "hint_signal_direction": "sink",
+          "hint_array_direction": null,
+          "required": false,
+          "docstring": null
+        }
+      ],
+      "argParams": [],
+      "is_abstract": false,
+      "docstring": null
+    },
+    {
+      "name": "",
       "type": "Stm32l432Base",
       "superClasses": [
         "Microcontroller",
@@ -20885,12 +21306,6 @@
         }
       ],
       "argParams": [
-        {
-          "name": "ripple_current_factor",
-          "type": "range",
-          "default_value": null,
-          "docstring": null
-        },
         {
           "name": "input_ripple_limit",
           "type": "float",
@@ -24681,6 +25096,10 @@
                     "children": []
                   },
                   {
+                    "name": "Er_Tft_128_3",
+                    "children": []
+                  },
+                  {
                     "name": "Qt096t_if09",
                     "children": []
                   }
@@ -25727,6 +26146,15 @@
                 ]
               },
               {
+                "name": "Stm32g431Base",
+                "children": [
+                  {
+                    "name": "Stm32g431kb",
+                    "children": []
+                  }
+                ]
+              },
+              {
                 "name": "Stm32l432Base",
                 "children": [
                   {
@@ -25803,6 +26231,15 @@
                 "children": [
                   {
                     "name": "Stm32g031_G",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "name": "Stm32g431Base",
+                "children": [
+                  {
+                    "name": "Stm32g431kb",
                     "children": []
                   }
                 ]
@@ -25930,6 +26367,10 @@
               {
                 "name": "Lsm6ds3trc",
                 "children": []
+              },
+              {
+                "name": "Lsm6dsv16x",
+                "children": []
               }
             ]
           },
@@ -26052,6 +26493,10 @@
             "children": [
               {
                 "name": "Lsm6ds3trc",
+                "children": []
+              },
+              {
+                "name": "Lsm6dsv16x",
                 "children": []
               }
             ]
