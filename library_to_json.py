@@ -1,14 +1,18 @@
 # Simple tool that scans for libraries and dumps the whole thing to a proto file
-from itertools import chain
-from typing import Optional, List, Any, Union, Tuple
 import inspect
+from itertools import chain
+from typing import Optional, List, Any, Union, Tuple, cast
+
 from pydantic import BaseModel
 
 from PolymorphicBlocks import edg
 from PolymorphicBlocks.edg import *
 from PolymorphicBlocks.edg import core, edgir
-from PolymorphicBlocks.edg.hdl_server.__main__ import LibraryElementIndexer
+from PolymorphicBlocks.edg.core.Binding import FloatLiteralBinding, IntLiteralBinding, \
+  StringLiteralBinding, BoolLiteralBinding, RangeLiteralBinding, ArrayLiteralBinding, ArrayBinding
 from PolymorphicBlocks.edg.core.Builder import builder
+from PolymorphicBlocks.edg.electronics_model.KiCadSchematicParser import test_cast
+from PolymorphicBlocks.edg.hdl_server.__main__ import LibraryElementIndexer
 
 
 def simpleName(target: edgir.ref_pb2.LibraryPath) -> str:
@@ -321,79 +325,55 @@ if __name__ == '__main__':
       print(f"Elaborating block {name}")
       block_proto = builder.elaborate_toplevel(instance)
 
-      # inspect into the args to get ArgParams
+      # get arg-params from _init_params_value
       argParams = []
-      sig = inspect.signature(cls.__init__)
-      for param_name, param in list(sig.parameters.items())[1:]:  # drop 'self'
-        # TODO NEED TO RECURSE FOR *ARGS / **KWARGS
-        if param.kind in [inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD,
-                          inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.POSITIONAL_ONLY,
-                          inspect.Parameter.KEYWORD_ONLY]:
-          param_pb = edgir.pair_get_opt(block_proto.params, param_name)
-          default_value: Optional[ParamValueTypes] = None
-
-          if param_pb is not None:
-            if param.default is inspect.Parameter.empty:
-              default_value = None
-            elif isinstance(param.default, (int, float, str, bool)):
-              default_value = param.default
-            elif isinstance(param.default, tuple) and len(param.default) == 2 and \
-                isinstance(param.default[0], (int, float)) and isinstance(param.default[1], (int, float)):
-              default_value = str(param.default)
-            elif isinstance(param.default, Range):
-              range = param.default
-              default_value = (range.lower, range.upper)
-            elif isinstance(param.default, RangeExpr):
-              if isinstance(param.default.binding, core.Binding.RangeLiteralBinding):
-                range = param.default.binding.value
-                default_value = (range.lower, range.upper)
-              else:
-                print(f"{name}.{param_name}: bad binding {param.default.binding}")
-            elif isinstance(param.default, FloatExpr):
-              if isinstance(param.default.binding, core.Binding.FloatLiteralBinding):
-                default_value = param.default.binding.value
-              else:
-                print(f"{name}.{param_name}: bad binding {param.default.binding}")
-            elif isinstance(param.default, BoolExpr):
-              if isinstance(param.default.binding, core.Binding.BoolLiteralBinding):
-                default_value = param.default.binding.value
-              else:
-                print(f"{name}.{param_name}: bad binding {param.default.binding}")
-            elif isinstance(param.default, StringExpr):
-              if isinstance(param.default.binding, core.Binding.StringLiteralBinding):
-                default_value = param.default.binding.value
-              else:
-                print(f"{name}.{param_name}: bad binding {param.default.binding}")
+      for param_name, (param, param_value) in instance._init_params_value.items():
+        default_value: Optional[ParamValueTypes] = None
+        if isinstance(param, FloatExpr):
+          param_type = 'float'
+          if param_value is not None:
+            default_value = test_cast(cast(ConstraintExpr, param_value).binding, FloatLiteralBinding).value
+        elif isinstance(param, IntExpr):
+          param_type = 'int'
+          if param_value is not None:
+            default_value = test_cast(cast(ConstraintExpr, param_value).binding, IntLiteralBinding).value
+        elif isinstance(param, BoolExpr):
+          param_type = 'bool'
+          if param_value is not None:
+            default_value = test_cast(cast(ConstraintExpr, param_value).binding, BoolLiteralBinding).value
+        elif isinstance(param, StringExpr):
+          param_type = 'str'
+          if param_value is not None:
+            default_value = test_cast(cast(ConstraintExpr, param_value).binding, StringLiteralBinding).value
+        elif isinstance(param, RangeExpr):
+          param_type = 'range'
+          if param_value is not None:
+            value_range = test_cast(cast(ConstraintExpr, param_value).binding, RangeLiteralBinding).value
+            default_value = (value_range.lower, value_range.upper)
+        elif isinstance(param, (ArrayIntExpr, ArrayBoolExpr, ArrayFloatExpr, ArrayStringExpr)):
+          param_type = 'array'
+          if param_value is not None:
+            binding = cast(ConstraintExpr, param_value).binding
+            if isinstance(binding, ArrayBinding):
+              assert binding.values == []  # TODO support array literals with values
+            elif isinstance(binding, ArrayLiteralBinding):
+              assert binding.values == []
             else:
-              print(f"{name}.{param_name}: failed to parse default {param.default}")
+              raise TypeError()
+            default_value = []
+        else:
+          raise ValueError(f"{name}.{param_name} unknown param type {type(param)}")
 
-            if param_pb.HasField('floating'):
-              param_type = 'float'
-            elif param_pb.HasField('integer'):
-              param_type = 'int'
-            elif param_pb.HasField('boolean'):
-              param_type = 'bool'
-            elif param_pb.HasField('text'):
-              param_type = 'str'
-            elif param_pb.HasField('range'):
-              param_type = 'range'
-            elif param_pb.HasField('array'):
-              param_type = 'array'
-            else:
-              raise ValueError(f"{name}.{param_name} unknown param type {param_pb}")
+        doc = None
+        if hasattr(instance, param_name) and getattr(instance, param_name) in instance._param_docs:
+          doc = instance._param_docs[getattr(instance, param_name)]
 
-            doc = None
-            if hasattr(instance, param_name) and getattr(instance, param_name) in instance._param_docs:
-              doc = instance._param_docs[getattr(instance, param_name)]
-
-            argParams.append(ParamJsonDict(
-              name=param_name,
-              type=param_type,
-              default_value=default_value,
-              docstring=doc
-            ))
-          else:
-            print(f"missing param {param_name} in {name}")
+        argParams.append(ParamJsonDict(
+          name=param_name,
+          type=param_type,
+          default_value=default_value,
+          docstring=doc
+        ))
 
       block_docstring = None
       if cls.__doc__ is not None:
