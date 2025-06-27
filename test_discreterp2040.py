@@ -13,5 +13,4 @@ class DiscreteRp2040TestCase(unittest.TestCase):
 
     hdl = tohdl_netlist(netlist)
     result = compile_netlist(netlist)  # just check it doesn't error out
-    print(result.kicadNetlist)
     self.assertEqual(result.errors, [])
