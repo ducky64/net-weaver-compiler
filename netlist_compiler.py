@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 import os.path
 from PolymorphicBlocks.edg import core, edgir
+from PolymorphicBlocks.edg.electronics_model.footprint import RefdesMode
 from netweaver_interface import JsonNetlist
 from hdl_generator import tohdl_netlist
 
@@ -65,7 +66,7 @@ compiled.append_values(RefdesRefinementPass().run(compiled))
   from PolymorphicBlocks.edg import SvgPcbTemplateBlock, SvgPcbBackend
 
   netlist = NetlistTransform(compiled).run()
-  kicad_netlist = generate_netlist(netlist, True)
+  kicad_netlist = generate_netlist(netlist, RefdesMode.PathnameAsValue)
   bom = GenerateBom().run(compiled)[0][1]
 
   # fetch KiCad data
